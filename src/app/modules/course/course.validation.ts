@@ -72,7 +72,7 @@ const createCourseSchema = z.object({
 
         courseType: z.enum(['online', 'offline', 'recorded']).optional().default('recorded'),
         level: z.enum(['beginner', 'intermediate', 'advanced']).optional().default('beginner'),
-        language: z.enum(['bangla', 'english', 'both']).optional().default('bangla'),
+        language: z.enum(['bangla', 'english', 'both']).optional().default('english'),
 
         totalDuration: z.number().min(0).optional(),
         totalLessons: z.number().min(0).optional(),

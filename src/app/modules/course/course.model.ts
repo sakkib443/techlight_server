@@ -134,7 +134,7 @@ const courseSchema = new Schema<ICourse, CourseModel>(
                 values: ['bangla', 'english', 'both'],
                 message: '{VALUE} is not a valid language',
             },
-            default: 'bangla',
+            default: 'english',
         },
 
         // ==================== Duration ====================
