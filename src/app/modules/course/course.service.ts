@@ -417,14 +417,6 @@ const toggleLike = async (id: string, userId: string): Promise<{ isLiked: boolea
             $inc: { likeCount: -1 }
         });
 
-        // Remove from wishlist
-        try {
-            const WishlistService = (await import('../wishlist/wishlist.module')).default;
-            await WishlistService.removeFromWishlist(userId, id);
-        } catch (error) {
-            console.error('Wishlist sync error (unlike):', error);
-        }
-
         const updated = await Course.findById(id).select('likeCount');
         return { isLiked: false, likeCount: Math.max(0, updated?.likeCount || 0) };
     } else {
@@ -434,12 +426,8 @@ const toggleLike = async (id: string, userId: string): Promise<{ isLiked: boolea
             $inc: { likeCount: 1 }
         });
 
-        // Add to wishlist
+        // Notification
         try {
-            const WishlistService = (await import('../wishlist/wishlist.module')).default;
-            await WishlistService.addToWishlist(userId, id, 'course');
-
-            // Notification
             const user = await User.findById(userId);
             if (user && course) {
                 await NotificationService.createLikeNotification({
@@ -451,7 +439,7 @@ const toggleLike = async (id: string, userId: string): Promise<{ isLiked: boolea
                 });
             }
         } catch (error) {
-            console.error('Wishlist/Notification sync error (like):', error);
+            console.error('Notification sync error (like):', error);
         }
 
         const updated = await Course.findById(id).select('likeCount');
