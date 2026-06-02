@@ -164,7 +164,7 @@ const enrollStudentToBatch = async (batchId: string, studentId: string): Promise
 // ==================== Get Batch Students ====================
 const getBatchStudents = async (batchId: string) => {
     const enrollments = await Enrollment.find({ batch: batchId })
-        .populate('student', 'name email avatar phone')
+        .populate('student', 'firstName lastName email avatar phone')
         .populate('course', 'title')
         .sort({ enrolledAt: -1 });
 

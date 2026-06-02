@@ -32,8 +32,10 @@ import { StatsRoutes } from './app/modules/stats/stats.routes';
 import { CouponRoutes } from './app/modules/coupon/coupon.routes';
 import { BlogRoutes } from './app/modules/blog/blog.routes';
 import { BatchRoutes } from './app/modules/batch/batch.routes';
+import { CertificateRoutes } from './app/modules/certificate/certificate.routes';
 import { LiveClassRoutes } from './app/modules/liveClass/liveClass.routes';
 import { InstructorRoutes } from './app/modules/instructor/instructor.routes';
+import { DesignRoutes } from './app/modules/design/design.routes';
 
 
 // ==================== App Initialization ====================
@@ -162,11 +164,18 @@ app.use('/api/blogs', BlogRoutes);
 // Batch routes (course batches for online courses)
 app.use('/api/batches', BatchRoutes);
 
+// Certificate routes (student certificates - issue, list, verify)
+app.use('/api/certificates', CertificateRoutes);
+
 // Live Class routes (live classes for batches)
 app.use('/api/live-classes', LiveClassRoutes);
 
 // Instructor routes
 app.use('/api/instructors', InstructorRoutes);
+
+// Site Content / Design routes (contact info, top header, social links)
+app.use('/api/design', DesignRoutes);
+app.use('/api/designs', DesignRoutes); // alias used by TopHeader (plural)
 
 // ==================== Error Handling ====================
 // 404 Not Found handler (must be after all routes)
