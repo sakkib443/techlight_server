@@ -8,6 +8,10 @@ const designSchema = new Schema<IDesign>(
             type: Schema.Types.Mixed,
             default: {},
         },
+        homeContent: {
+            type: Schema.Types.Mixed,
+            default: {},
+        },
     },
     {
         timestamps: true,

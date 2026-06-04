@@ -24,7 +24,30 @@ const updateContactContent = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getHomeContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.getHomeContent();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Home content fetched successfully',
+        data: result,
+    });
+});
+
+const updateHomeContent = catchAsync(async (req: Request, res: Response) => {
+    const { homeContent } = req.body;
+    const result = await DesignService.updateHomeContent(homeContent || {});
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Home content updated successfully',
+        data: result,
+    });
+});
+
 export const DesignController = {
     getContactContent,
     updateContactContent,
+    getHomeContent,
+    updateHomeContent,
 };

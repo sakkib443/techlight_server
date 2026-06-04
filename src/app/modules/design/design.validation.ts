@@ -6,6 +6,13 @@ const updateContactSchema = z.object({
     }),
 });
 
+const updateHomeSchema = z.object({
+    body: z.object({
+        homeContent: z.record(z.string(), z.any()).optional(),
+    }),
+});
+
 export const DesignValidation = {
     updateContactSchema,
+    updateHomeSchema,
 };

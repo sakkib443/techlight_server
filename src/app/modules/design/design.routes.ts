@@ -19,4 +19,16 @@ router.patch(
     DesignController.updateContactContent
 );
 
+// Public - fetch home content (hero + mission sections)
+router.get('/home', DesignController.getHomeContent);
+
+// Admin - update home content
+router.patch(
+    '/home',
+    authMiddleware,
+    checkRole('admin'),
+    validateRequest(DesignValidation.updateHomeSchema),
+    DesignController.updateHomeContent
+);
+
 export const DesignRoutes = router;

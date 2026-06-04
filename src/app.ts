@@ -36,6 +36,7 @@ import { CertificateRoutes } from './app/modules/certificate/certificate.routes'
 import { LiveClassRoutes } from './app/modules/liveClass/liveClass.routes';
 import { InstructorRoutes } from './app/modules/instructor/instructor.routes';
 import { DesignRoutes } from './app/modules/design/design.routes';
+import { ReviewRoutes } from './app/modules/review/review.routes';
 
 
 // ==================== App Initialization ====================
@@ -176,6 +177,9 @@ app.use('/api/instructors', InstructorRoutes);
 // Site Content / Design routes (contact info, top header, social links)
 app.use('/api/design', DesignRoutes);
 app.use('/api/designs', DesignRoutes); // alias used by TopHeader (plural)
+
+// Review routes (student testimonials shown on the home page)
+app.use('/api/reviews', ReviewRoutes);
 
 // ==================== Error Handling ====================
 // 404 Not Found handler (must be after all routes)
