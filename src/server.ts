@@ -7,12 +7,21 @@ import mongoose from 'mongoose';
 import app from './app';
 import config from './app/config';
 
-// ==================== Uncaught Exception Handler ====================
-process.on('uncaughtException', (error) => {
-  console.error('💥 UNCAUGHT EXCEPTION! Shutting down...');
-  console.error('Error:', error.message);
-  console.error(error.stack);
-  process.exit(1);
+// ==================== Process Safety (serverless aware) ====================
+const isProduction = process.env.NODE_ENV === 'production';
+
+// In serverless (production) we must NOT call process.exit() — exiting during an
+// invocation crashes the whole function (Vercel: FUNCTION_INVOCATION_FAILED).
+// Log it and let the platform manage the lifecycle instead.
+process.on('uncaughtException', (error: Error) => {
+  console.error('💥 UNCAUGHT EXCEPTION:', error?.message);
+  console.error(error?.stack);
+  if (!isProduction) process.exit(1);
+});
+
+process.on('unhandledRejection', (reason: unknown) => {
+  console.error('💥 UNHANDLED REJECTION:', reason instanceof Error ? reason.message : reason);
+  if (!isProduction) process.exit(1);
 });
 
 // ==================== MongoDB Connection Caching ====================
@@ -87,12 +96,18 @@ async function cleanupStaleIndexes() {
   }
 }
 
+// Prevent an emitted Mongoose connection 'error' event (with no listener) from
+// bubbling up as an uncaughtException and crashing the serverless function.
+mongoose.connection.on('error', (err) => {
+  console.error('❌ MongoDB connection error event:', err?.message || err);
+});
+
 // ==================== Connect DB immediately ====================
 // Vercel এ এই connection serverless function start হওয়ার সাথে সাথে শুরু হবে
 connectDB().then(() => {
   cleanupStaleIndexes();
 }).catch((error) => {
-  console.error('❌ Initial MongoDB connection failed:', error);
+  console.error('❌ Initial MongoDB connection failed:', error?.message || error);
 });
 
 // ==================== Local Development Server ====================
@@ -109,14 +124,6 @@ if (process.env.NODE_ENV !== 'production') {
     console.log('║                                              ║');
     console.log('╚══════════════════════════════════════════════╝');
     console.log('');
-  });
-
-  process.on('unhandledRejection', (error: Error) => {
-    console.error('💥 UNHANDLED REJECTION! Shutting down...');
-    console.error('Error:', error.message);
-    server.close(() => {
-      process.exit(1);
-    });
   });
 
   process.on('SIGTERM', () => {

@@ -139,6 +139,7 @@ const getStudentEnrollments = async (
 
     const enrollments = await Enrollment.find(query)
         .populate('course', 'title titleBn slug thumbnail totalLessons totalDuration averageRating')
+        .populate('batch', 'batchName batchCode')
         .sort({ lastAccessedAt: -1, enrolledAt: -1 });
 
     return enrollments;

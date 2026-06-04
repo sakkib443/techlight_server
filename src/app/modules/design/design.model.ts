@@ -1,11 +1,7 @@
-// ===================================================================
-// Techlight IT Institute LMS - Design Model
-// Mongoose schema for website design/content
-// ===================================================================
-
 import { Schema, model } from 'mongoose';
-import { IDesign, DesignModel } from './design.interface';
+import { IDesign } from './design.interface';
 
+<<<<<<< HEAD
 const heroContentSchema = new Schema({
     badge: {
         text: { type: String, default: 'Premium Learning Platform' },
@@ -177,41 +173,28 @@ const contactContentSchema = new Schema({
 }, { _id: false });
 
 const designSchema = new Schema<IDesign, DesignModel>(
+=======
+const designSchema = new Schema<IDesign>(
+>>>>>>> cd51453f7d79d5d78c7c80e636e0922c99bbda03
     {
-        section: {
-            type: String,
-            required: true,
-            enum: ['hero', 'about', 'footer', 'topHeader', 'navbar', 'contact', 'popularCourse', 'digitalProducts', 'whatWeProvide', 'aboutHero', 'aboutMission', 'aboutStats', 'aboutFeatures', 'aboutFounder', 'aboutGlobal', 'aboutCTA'],
-            unique: true
+        key: { type: String, required: true, unique: true, index: true },
+        contactContent: {
+            type: Schema.Types.Mixed,
+            default: {},
         },
-        heroContent: heroContentSchema,
-        popularCourseContent: popularCourseContentSchema,
-        digitalProductsContent: digitalProductsContentSchema,
-        whatWeProvideContent: whatWeProvideContentSchema,
-        contactContent: contactContentSchema,
-        // About page sections - flexible Schema.Types.Mixed
-        aboutHeroContent: { type: Schema.Types.Mixed },
-        aboutMissionContent: { type: Schema.Types.Mixed },
-        aboutStatsContent: { type: Schema.Types.Mixed },
-        aboutFeaturesContent: { type: Schema.Types.Mixed },
-        aboutFounderContent: { type: Schema.Types.Mixed },
-        aboutGlobalContent: { type: Schema.Types.Mixed },
-        aboutCTAContent: { type: Schema.Types.Mixed },
-        isActive: {
-            type: Boolean,
-            default: true
-        }
+        heroContent: {
+            type: Schema.Types.Mixed,
+            default: {},
+        },
+        provideContent: {
+            type: Schema.Types.Mixed,
+            default: {},
+        },
     },
     {
         timestamps: true,
-        versionKey: false
+        minimize: false,
     }
 );
 
-// Static method to find by section
-designSchema.statics.findBySection = async function (section: string) {
-    return this.findOne({ section });
-};
-
-export const Design = model<IDesign, DesignModel>('Design', designSchema);
-
+export const Design = model<IDesign>('Design', designSchema);

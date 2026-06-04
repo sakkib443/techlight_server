@@ -1,11 +1,7 @@
-// ===================================================================
-// Techlight IT Institute LMS - Design Service
-// Business logic for Design module
-// ===================================================================
-
-import { IDesign } from './design.interface';
 import { Design } from './design.model';
+import { IContactContent, IHeroContent, IProvideContent } from './design.interface';
 
+<<<<<<< HEAD
 /**
  * One-time cleanup: detect old/stale contact data from previous client and reset to demo defaults.
  * Triggers when document contains specific hardcoded old company markers.
@@ -47,48 +43,19 @@ const getDesignBySection = async (section: string): Promise<IDesign | null> => {
     }
 
     let design = await Design.findBySection(section);
+=======
+const CONTACT_KEY = 'contact';
+const HERO_KEY = 'hero';
+const PROVIDE_KEY = 'provide';
+>>>>>>> cd51453f7d79d5d78c7c80e636e0922c99bbda03
 
-    // If hero section doesn't exist, create default
-    if (!design && section === 'hero') {
-        design = await Design.create({
-            section: 'hero',
-            heroContent: {
-                badge: {
-                    text: 'Premium Learning Platform',
-                    textBn: 'প্রিমিয়াম লার্নিং প্ল্যাটফর্ম',
-                    showNew: true
-                },
-                heading: {
-                    line1: 'Discover Premium',
-                    line1Bn: 'আবিষ্কার করুন প্রিমিয়াম'
-                },
-                dynamicTexts: ['Professional Courses', 'Software Tools', 'Web Development'],
-                dynamicTextsBn: ['প্রফেশনাল কোর্স', 'সফটওয়্যার টুলস', 'ওয়েব ডেভেলপমেন্ট'],
-                description: {
-                    text: 'Access thousands of premium courses, software, and digital products. Built by experts, ready for you to launch in minutes.',
-                    textBn: 'হাজার হাজার প্রিমিয়াম কোর্স, সফটওয়্যার এবং ডিজিটাল প্রোডাক্ট অ্যাক্সেস করুন। বিশেষজ্ঞদের দ্বারা তৈরি।',
-                    brandName: 'Techlight IT Institute'
-                },
-                features: [
-                    { text: 'Instant Access', textBn: 'তাৎক্ষণিক অ্যাক্সেস' },
-                    { text: 'Lifetime Updates', textBn: 'আজীবন আপডেট' },
-                    { text: 'Premium Support', textBn: 'প্রিমিয়াম সাপোর্ট' },
-                    { text: 'Money Back Guarantee', textBn: 'মানি ব্যাক গ্যারান্টি' }
-                ],
-                searchPlaceholder: {
-                    text: 'Search courses, software, themes...',
-                    textBn: 'কোর্স, সফটওয়্যার, থিম খুঁজুন...'
-                },
-                stats: {
-                    activeUsers: 5000,
-                    downloads: 12000,
-                    avgRating: 4.8,
-                    totalCourses: 500
-                }
-            },
-            isActive: true
-        });
+// ==================== Contact ====================
+const getContactContent = async (): Promise<{ contactContent: IContactContent }> => {
+    let doc = await Design.findOne({ key: CONTACT_KEY });
+    if (!doc) {
+        doc = await Design.create({ key: CONTACT_KEY, contactContent: {} });
     }
+<<<<<<< HEAD
 
     // If contact section doesn't exist, create default with DEMO placeholders.
     // Real values must be set via admin panel.
@@ -236,56 +203,67 @@ const getDesignBySection = async (section: string): Promise<IDesign | null> => {
     }
 
     return design;
+=======
+    return { contactContent: (doc.contactContent || {}) as IContactContent };
+>>>>>>> cd51453f7d79d5d78c7c80e636e0922c99bbda03
 };
 
-/**
- * Get all designs
- */
-const getAllDesigns = async (): Promise<IDesign[]> => {
-    return Design.find({});
-};
-
-/**
- * Update design by section
- */
-const updateDesignBySection = async (
-    section: string,
-    payload: Partial<IDesign>
-): Promise<IDesign | null> => {
-    // Use upsert to create if doesn't exist
-    const result = await Design.findOneAndUpdate(
-        { section },
-        { $set: payload },
-        { new: true, upsert: true }
+const updateContactContent = async (
+    contactContent: IContactContent
+): Promise<{ contactContent: IContactContent }> => {
+    const doc = await Design.findOneAndUpdate(
+        { key: CONTACT_KEY },
+        { $set: { contactContent } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
     );
-    return result;
+    return { contactContent: (doc?.contactContent || {}) as IContactContent };
 };
 
-/**
- * Create or update design
- */
-const createDesign = async (payload: IDesign): Promise<IDesign> => {
-    // Check if section already exists
-    const existing = await Design.findOne({ section: payload.section });
-
-    if (existing) {
-        // Update existing
-        const updated = await Design.findOneAndUpdate(
-            { section: payload.section },
-            { $set: payload },
-            { new: true }
-        );
-        return updated!;
+// ==================== Home: Hero ====================
+const getHeroContent = async (): Promise<{ heroContent: IHeroContent }> => {
+    let doc = await Design.findOne({ key: HERO_KEY });
+    if (!doc) {
+        doc = await Design.create({ key: HERO_KEY, heroContent: {} });
     }
+    return { heroContent: (doc.heroContent || {}) as IHeroContent };
+};
 
-    // Create new
-    const result = await Design.create(payload);
-    return result;
+const updateHeroContent = async (
+    heroContent: IHeroContent
+): Promise<{ heroContent: IHeroContent }> => {
+    const doc = await Design.findOneAndUpdate(
+        { key: HERO_KEY },
+        { $set: { heroContent } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+    return { heroContent: (doc?.heroContent || {}) as IHeroContent };
+};
+
+// ==================== Home: What We Provide ====================
+const getProvideContent = async (): Promise<{ provideContent: IProvideContent }> => {
+    let doc = await Design.findOne({ key: PROVIDE_KEY });
+    if (!doc) {
+        doc = await Design.create({ key: PROVIDE_KEY, provideContent: {} });
+    }
+    return { provideContent: (doc.provideContent || {}) as IProvideContent };
+};
+
+const updateProvideContent = async (
+    provideContent: IProvideContent
+): Promise<{ provideContent: IProvideContent }> => {
+    const doc = await Design.findOneAndUpdate(
+        { key: PROVIDE_KEY },
+        { $set: { provideContent } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+    return { provideContent: (doc?.provideContent || {}) as IProvideContent };
 };
 
 export const DesignService = {
-    getDesignBySection,
-    getAllDesigns,
-    updateDesignBySection,
-    createDesign
+    getContactContent,
+    updateContactContent,
+    getHeroContent,
+    updateHeroContent,
+    getProvideContent,
+    updateProvideContent,
 };

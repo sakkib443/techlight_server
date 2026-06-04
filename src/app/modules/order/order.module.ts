@@ -12,7 +12,6 @@ import AppError from '../../utils/AppError';
 import express from 'express';
 import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
-import DownloadService from '../download/download.module';
 import EmailService from '../email/email.service';
 import { User } from '../user/user.model';
 import { NotificationService } from '../notification/notification.module';
@@ -174,26 +173,6 @@ const deliverOrderItems = async (order: any, rawItems?: any[]): Promise<void> =>
                         console.error(`Enrollment failed for ${productId}:`, enrollError);
                     }
                 }
-            } else if (item.productType === 'website') {
-                const { Website } = await import('../website/website.model');
-                await Website.findByIdAndUpdate(productId, { $inc: { salesCount: 1 } });
-                await DownloadService.createDownloadRecord(
-                    userId,
-                    order._id!.toString(),
-                    productId,
-                    item.productType,
-                    item.title
-                );
-            } else if (item.productType === 'design-template' || item.productType === 'software') {
-                const { DesignTemplate } = await import('../designTemplate/designTemplate.model');
-                await DesignTemplate.findByIdAndUpdate(productId, { $inc: { salesCount: 1 } });
-                await DownloadService.createDownloadRecord(
-                    userId,
-                    order._id!.toString(),
-                    productId,
-                    item.productType,
-                    item.title
-                );
             }
 
         } catch (error) {

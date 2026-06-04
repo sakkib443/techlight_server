@@ -1,84 +1,76 @@
-// ===================================================================
-// MotionBoss LMS - Design Controller
-// HTTP request handlers for Design module
-// ===================================================================
-
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
 import { DesignService } from './design.service';
 
-/**
- * Get design by section (public)
- */
-const getDesignBySection = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { section } = req.params;
-        const result = await DesignService.getDesignBySection(section);
+// ==================== Contact ====================
+const getContactContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.getContactContent();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Contact content fetched successfully',
+        data: result,
+    });
+});
 
-        res.status(200).json({
-            success: true,
-            message: `${section} design retrieved successfully`,
-            data: result
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+const updateContactContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.updateContactContent(req.body.contactContent || {});
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Contact content updated successfully',
+        data: result,
+    });
+});
 
-/**
- * Get all designs (admin)
- */
-const getAllDesigns = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const result = await DesignService.getAllDesigns();
+// ==================== Home: Hero ====================
+const getHeroContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.getHeroContent();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Hero content fetched successfully',
+        data: result,
+    });
+});
 
-        res.status(200).json({
-            success: true,
-            message: 'All designs retrieved successfully',
-            data: result
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+const updateHeroContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.updateHeroContent(req.body.heroContent || {});
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Hero content updated successfully',
+        data: result,
+    });
+});
 
-/**
- * Update design by section (admin)
- */
-const updateDesignBySection = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { section } = req.params;
-        const result = await DesignService.updateDesignBySection(section, req.body);
+// ==================== Home: What We Provide ====================
+const getProvideContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.getProvideContent();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Provide content fetched successfully',
+        data: result,
+    });
+});
 
-        res.status(200).json({
-            success: true,
-            message: `${section} design updated successfully`,
-            data: result
-        });
-    } catch (error) {
-        next(error);
-    }
-};
-
-/**
- * Create design (admin)
- */
-const createDesign = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const result = await DesignService.createDesign(req.body);
-
-        res.status(201).json({
-            success: true,
-            message: 'Design created successfully',
-            data: result
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+const updateProvideContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.updateProvideContent(req.body.provideContent || {});
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Provide content updated successfully',
+        data: result,
+    });
+});
 
 export const DesignController = {
-    getDesignBySection,
-    getAllDesigns,
-    updateDesignBySection,
-    createDesign
+    getContactContent,
+    updateContactContent,
+    getHeroContent,
+    updateHeroContent,
+    getProvideContent,
+    updateProvideContent,
 };

@@ -11,7 +11,6 @@ import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
 import { Order } from '../order/order.module';
 import { BkashPayment } from '../bkash/bkash.module';
 import { User } from '../user/user.model';
-import { Website } from '../website/website.model';
 import { Course } from '../course/course.model';
 import { Lesson } from '../lesson/lesson.model';
 import { Enrollment } from '../enrollment/enrollment.model';
@@ -57,9 +56,6 @@ const AnalyticsService = {
         today.setHours(0, 0, 0, 0);
         const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-        // Import dynamically to avoid circular dependencies
-        const { DesignTemplate } = await import('../designTemplate/designTemplate.model');
-
         const { Category } = await import('../category/category.model');
 
         const [
@@ -76,10 +72,6 @@ const AnalyticsService = {
             activeEnrollments,
             completedEnrollments,
             enrollmentsThisMonth,
-            // Product counts
-            totalWebsites,
-            totalDesignTemplates,
-
             // Category count
             totalCategories,
             // Order counts
@@ -88,9 +80,6 @@ const AnalyticsService = {
             pendingOrders,
             completedOrders,
             // Engagement (Sum of likeCount)
-            websiteLikes,
-            designTemplateLikes,
-
             courseLikes,
             // Revenue aggregations
             totalRevenueResult,
@@ -110,10 +99,6 @@ const AnalyticsService = {
             Enrollment.countDocuments({ status: 'active' }),
             Enrollment.countDocuments({ status: 'completed' }),
             Enrollment.countDocuments({ enrolledAt: { $gte: firstDayOfMonth } }),
-            // Product queries
-            Website.countDocuments({ isDeleted: false }),
-            DesignTemplate.countDocuments({ isDeleted: false }),
-
             // Category query
             Category.countDocuments({}),
             // Order queries
@@ -122,9 +107,6 @@ const AnalyticsService = {
             Order.countDocuments({ paymentStatus: 'pending' }),
             Order.countDocuments({ paymentStatus: 'completed' }),
             // Engagement (Sum of likeCount)
-            Website.aggregate([{ $group: { _id: null, total: { $sum: '$likeCount' } } }]),
-            DesignTemplate.aggregate([{ $group: { _id: null, total: { $sum: '$likeCount' } } }]),
-
             Course.aggregate([{ $group: { _id: null, total: { $sum: '$likeCount' } } }]),
             // Revenue aggregations
             Order.aggregate([
@@ -156,8 +138,8 @@ const AnalyticsService = {
             completedEnrollments,
             enrollmentsThisMonth,
             // Product Stats
-            totalWebsites,
-            totalDesignTemplates,
+            totalWebsites: 0,
+            totalDesignTemplates: 0,
 
             // Order & Revenue Stats
             totalOrders,
@@ -170,7 +152,7 @@ const AnalyticsService = {
             // Category Stats
             totalCategories,
             // Engagement
-            totalLikes: (websiteLikes[0]?.total || 0) + (designTemplateLikes[0]?.total || 0) + (courseLikes[0]?.total || 0),
+            totalLikes: courseLikes[0]?.total || 0,
 
         };
     },
@@ -187,40 +169,27 @@ const AnalyticsService = {
         averageRating: number;
         totalReviews: number;
     }> {
-        // Import DesignTemplate model dynamically to avoid circular dependency
-        const { DesignTemplate } = await import('../designTemplate/designTemplate.model');
-
-        const { Review } = await import('../review/review.module');
-
         const [
-            totalWebsites,
-            totalDesignTemplates,
-
             totalCustomers,
             totalDownloads,
             ratingResult,
-            totalReviews,
         ] = await Promise.all([
-            Website.countDocuments({ isDeleted: false }),
-            DesignTemplate.countDocuments({ isDeleted: false }),
-
             User.countDocuments({ isDeleted: false }),
             Order.countDocuments({ paymentStatus: 'completed' }),
-            Website.aggregate([
-                { $match: { isDeleted: false, rating: { $gt: 0 } } },
+            Course.aggregate([
+                { $match: { rating: { $gt: 0 } } },
                 { $group: { _id: null, avg: { $avg: '$rating' } } }
             ]),
-            Review ? Review.countDocuments() : Promise.resolve(0),
         ]);
 
         return {
-            totalWebsites,
-            totalDesignTemplates,
+            totalWebsites: 0,
+            totalDesignTemplates: 0,
 
             totalCustomers,
             totalDownloads,
             averageRating: ratingResult[0]?.avg ? parseFloat(ratingResult[0].avg.toFixed(1)) : 4.8,
-            totalReviews,
+            totalReviews: 0,
         };
     },
 
@@ -345,9 +314,9 @@ const AnalyticsService = {
      * Top Selling Products - সবচেয়ে বেশি বিক্রি হওয়া products
      */
     async getTopSellingProducts(limit = 10): Promise<any[]> {
-        return await Website.find({ isDeleted: false })
-            .select('title slug price salesCount rating images')
-            .sort({ salesCount: -1 })
+        return await Course.find({})
+            .select('title slug price totalEnrollments rating thumbnail')
+            .sort({ totalEnrollments: -1 })
             .limit(limit);
     },
 

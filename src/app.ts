@@ -17,15 +17,9 @@ import config from './app/config';
 import { AuthRoutes } from './app/modules/auth/auth.routes';
 import { UserRoutes } from './app/modules/user/user.routes';
 import { CategoryRoutes } from './app/modules/category/category.routes';
-import { PlatformRoutes } from './app/modules/platform/platform.routes';
-import { WebsiteRoutes } from './app/modules/website/website.routes';
-// import { SoftwareRoutes } from './app/modules/software/software.routes';
 
 import { CartRoutes } from './app/modules/cart/cart.module';
-import { WishlistRoutes } from './app/modules/wishlist/wishlist.module';
 import { OrderRoutes } from './app/modules/order/order.module';
-import { ReviewRoutes } from './app/modules/review/review.module';
-import { DownloadRoutes } from './app/modules/download/download.module';
 import { BkashRoutes } from './app/modules/bkash/bkash.module';
 import { AnalyticsRoutes } from './app/modules/analytics/analytics.module';
 import { uploadRoutes } from './app/modules/upload/upload.routes';
@@ -34,16 +28,14 @@ import { LessonRoutes } from './app/modules/lesson/lesson.routes';
 import { ModuleRoutes } from './app/modules/module/module.routes';
 import { EnrollmentRoutes } from './app/modules/enrollment/enrollment.routes';
 import { NotificationRoutes } from './app/modules/notification/notification.module';
-import { DesignRoutes } from './app/modules/design/design.routes';
 import { StatsRoutes } from './app/modules/stats/stats.routes';
 import { CouponRoutes } from './app/modules/coupon/coupon.routes';
-import { SiteContentRoutes } from './app/modules/siteContent/siteContent.routes';
-import { PageContentRoutes } from './app/modules/pageContent/pageContent.routes';
 import { BlogRoutes } from './app/modules/blog/blog.routes';
-import { DesignTemplateRoutes } from './app/modules/designTemplate/designTemplate.routes';
 import { BatchRoutes } from './app/modules/batch/batch.routes';
+import { CertificateRoutes } from './app/modules/certificate/certificate.routes';
 import { LiveClassRoutes } from './app/modules/liveClass/liveClass.routes';
 import { InstructorRoutes } from './app/modules/instructor/instructor.routes';
+import { DesignRoutes } from './app/modules/design/design.routes';
 import { ContactMessageRoutes } from './app/modules/contactMessage/contactMessage.routes';
 
 
@@ -131,20 +123,6 @@ app.use('/api/users', UserRoutes);
 // Category routes (public + admin)
 app.use('/api/categories', CategoryRoutes);
 
-// Platform routes (public + admin)
-app.use('/api/platforms', PlatformRoutes);
-
-// Website product routes (main marketplace)
-app.use('/api/websites', WebsiteRoutes);
-
-// Software product routes (scripts & plugins marketplace) - REMOVED
-// app.use('/api/software', SoftwareRoutes);
-
-
-// Design template product routes (new marketplace section)
-app.use('/api/design-templates', DesignTemplateRoutes);
-
-
 // Course routes (LMS - public + admin)
 app.use('/api/courses', CourseRoutes);
 
@@ -160,17 +138,8 @@ app.use('/api/enrollments', EnrollmentRoutes);
 // Cart routes (authenticated)
 app.use('/api/cart', CartRoutes);
 
-// Wishlist routes (authenticated)
-app.use('/api/wishlist', WishlistRoutes);
-
 // Order routes (authenticated)
 app.use('/api/orders', OrderRoutes);
-
-// Review routes (public + authenticated)
-app.use('/api/reviews', ReviewRoutes);
-
-// Download routes (authenticated)
-app.use('/api/downloads', DownloadRoutes);
 
 // bKash Payment routes (authenticated)
 app.use('/api/bkash', BkashRoutes);
@@ -184,20 +153,11 @@ app.use('/api/upload', uploadRoutes);
 // Notification routes (admin only)
 app.use('/api/notifications', NotificationRoutes);
 
-// Design routes (website design/content management)
-app.use('/api/design', DesignRoutes);
-
 // Stats routes (real-time database statistics)
 app.use('/api/stats', StatsRoutes);
 
 // Coupon routes (discount codes)
 app.use('/api/coupons', CouponRoutes);
-
-// Site Content routes (editable website content)
-app.use('/api/site-content', SiteContentRoutes);
-
-// Page Content routes (dynamic page content management)
-app.use('/api/page-content', PageContentRoutes);
 
 // Blog routes (blog posts and comments)
 app.use('/api/blogs', BlogRoutes);
@@ -205,11 +165,18 @@ app.use('/api/blogs', BlogRoutes);
 // Batch routes (course batches for online courses)
 app.use('/api/batches', BatchRoutes);
 
+// Certificate routes (student certificates - issue, list, verify)
+app.use('/api/certificates', CertificateRoutes);
+
 // Live Class routes (live classes for batches)
 app.use('/api/live-classes', LiveClassRoutes);
 
 // Instructor routes
 app.use('/api/instructors', InstructorRoutes);
+
+// Site Content / Design routes (contact info, top header, social links)
+app.use('/api/design', DesignRoutes);
+app.use('/api/designs', DesignRoutes);
 
 // Contact Message routes (public submit + admin view)
 app.use('/api/contact', ContactMessageRoutes);

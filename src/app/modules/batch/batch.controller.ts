@@ -124,7 +124,7 @@ const removeStudent = catchAsync(async (req: Request, res: Response) => {
 
 // ==================== Get My Batches (Student) ====================
 const getMyBatches = catchAsync(async (req: Request, res: Response) => {
-    const studentId = (req as any).user._id;
+    const studentId = req.user!.userId;
     const result = await BatchService.getMyBatches(studentId);
     sendResponse(res, {
         statusCode: 200,

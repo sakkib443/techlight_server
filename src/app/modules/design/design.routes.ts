@@ -1,37 +1,40 @@
-// ===================================================================
-// MotionBoss LMS - Design Routes
-// API endpoints for Design module
-// ===================================================================
-
 import express from 'express';
-import { DesignController } from './design.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import { DesignValidation } from './design.validation';
+import { DesignController } from './design.controller';
+import { authMiddleware } from '../../middlewares/auth';
+import { checkRole } from '../../middlewares/chackRole';
 
 const router = express.Router();
 
-// ==================== Public Routes ====================
-
-// Get design by section (for frontend)
-router.get('/:section', DesignController.getDesignBySection);
-
-// ==================== Admin Routes ====================
-
-// Get all designs
-router.get('/', DesignController.getAllDesigns);
-
-// Create new design
-router.post(
-    '/',
-    validateRequest(DesignValidation.createDesignZodSchema),
-    DesignController.createDesign
+// ==================== Contact ====================
+router.get('/contact', DesignController.getContactContent);
+router.patch(
+    '/contact',
+    authMiddleware,
+    checkRole('admin'),
+    validateRequest(DesignValidation.updateContactSchema),
+    DesignController.updateContactContent
 );
 
-// Update design by section
+// ==================== Home: Hero ====================
+router.get('/hero', DesignController.getHeroContent);
 router.patch(
-    '/:section',
-    validateRequest(DesignValidation.updateDesignZodSchema),
-    DesignController.updateDesignBySection
+    '/hero',
+    authMiddleware,
+    checkRole('admin'),
+    validateRequest(DesignValidation.updateHeroSchema),
+    DesignController.updateHeroContent
+);
+
+// ==================== Home: What We Provide ====================
+router.get('/provide', DesignController.getProvideContent);
+router.patch(
+    '/provide',
+    authMiddleware,
+    checkRole('admin'),
+    validateRequest(DesignValidation.updateProvideSchema),
+    DesignController.updateProvideContent
 );
 
 export const DesignRoutes = router;

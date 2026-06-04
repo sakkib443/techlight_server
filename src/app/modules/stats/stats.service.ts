@@ -5,10 +5,7 @@
 
 import { User } from '../user/user.model';
 import { Course } from '../course/course.model';
-import { Website } from '../website/website.model';
-import { DesignTemplate } from '../designTemplate/designTemplate.model';
 import { Enrollment } from '../enrollment/enrollment.model';
-import { Review } from '../review/review.module';
 
 /**
  * Get real-time dashboard stats from database
@@ -18,44 +15,32 @@ const getDashboardStats = async () => {
         // Count all users
         const totalUsers = await User.countDocuments({ isDeleted: { $ne: true } });
 
-        // Count all products (approved/published status or all non-deleted)
+        // Count courses
         const totalCourses = await Course.countDocuments({ status: 'published' });
-        // Websites and DesignTemplates use 'approved' status
-        const totalWebsites = await Website.countDocuments({ status: 'approved', isDeleted: { $ne: true } });
-        const totalDesignTemplates = await DesignTemplate.countDocuments({ status: 'approved', isDeleted: { $ne: true } });
-
-        // Also count all (including pending) for better results if no approved items
-        const allWebsites = await Website.countDocuments({ isDeleted: { $ne: true } });
-        const allDesignTemplates = await DesignTemplate.countDocuments({ isDeleted: { $ne: true } });
         const allCourses = await Course.countDocuments({});
 
-        const totalProducts = (totalCourses || allCourses) + (totalWebsites || allWebsites) + (totalDesignTemplates || allDesignTemplates);
+        const totalProducts = totalCourses || allCourses;
 
-        // Count total enrollments/downloads
+        // Count total enrollments
         const totalEnrollments = await Enrollment.countDocuments({});
 
-        // Calculate average rating from reviews
-        const reviewStats = await Review.aggregate([
-            { $match: { isDeleted: { $ne: true } } },
-            { $group: { _id: null, avgRating: { $avg: '$rating' }, totalReviews: { $sum: 1 } } }
+        // Average course rating
+        const ratingStats = await Course.aggregate([
+            { $match: { rating: { $gt: 0 } } },
+            { $group: { _id: null, avgRating: { $avg: '$rating' }, total: { $sum: 1 } } }
         ]);
 
-        const avgRating = reviewStats.length > 0 ? reviewStats[0].avgRating : 4.8;
-        const totalReviews = reviewStats.length > 0 ? reviewStats[0].totalReviews : 0;
+        const avgRating = ratingStats.length > 0 ? ratingStats[0].avgRating : 4.8;
 
         return {
             activeUsers: totalUsers,
             downloads: totalEnrollments,
             avgRating: Math.round(avgRating * 10) / 10, // Round to 1 decimal
             totalProducts: totalProducts,
-            // Extra details - use all counts to show actual data
             breakdown: {
                 courses: allCourses || totalCourses,
-                websites: allWebsites || totalWebsites,
-                designTemplates: allDesignTemplates || totalDesignTemplates,
                 users: totalUsers,
                 enrollments: totalEnrollments,
-                reviews: totalReviews
             }
         };
 
@@ -69,11 +54,8 @@ const getDashboardStats = async () => {
             totalProducts: 0,
             breakdown: {
                 courses: 0,
-                websites: 0,
-                designTemplates: 0,
                 users: 0,
                 enrollments: 0,
-                reviews: 0
             }
         };
     }
