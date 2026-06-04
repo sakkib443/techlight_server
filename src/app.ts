@@ -44,6 +44,7 @@ import { DesignTemplateRoutes } from './app/modules/designTemplate/designTemplat
 import { BatchRoutes } from './app/modules/batch/batch.routes';
 import { LiveClassRoutes } from './app/modules/liveClass/liveClass.routes';
 import { InstructorRoutes } from './app/modules/instructor/instructor.routes';
+import { ContactMessageRoutes } from './app/modules/contactMessage/contactMessage.routes';
 
 
 // ==================== App Initialization ====================
@@ -209,6 +210,9 @@ app.use('/api/live-classes', LiveClassRoutes);
 
 // Instructor routes
 app.use('/api/instructors', InstructorRoutes);
+
+// Contact Message routes (public submit + admin view)
+app.use('/api/contact', ContactMessageRoutes);
 
 // ==================== Error Handling ====================
 // 404 Not Found handler (must be after all routes)

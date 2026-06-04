@@ -7,9 +7,45 @@ import { IDesign } from './design.interface';
 import { Design } from './design.model';
 
 /**
+ * One-time cleanup: detect old/stale contact data from previous client and reset to demo defaults.
+ * Triggers when document contains specific hardcoded old company markers.
+ */
+const cleanupStaleContactData = async (): Promise<void> => {
+    const existing = await Design.findBySection('contact');
+    if (!existing || !existing.contactContent) return;
+
+    const ci = existing.contactContent.contactInfo;
+    const sl = existing.contactContent.socialLinks;
+    const map = existing.contactContent.mapEmbedUrl || '';
+
+    // Markers from the old client's data
+    const oldMarkers = [
+        '01730481212',
+        '1829-818616',
+        'Daisy Garden',
+        'Banasree',
+        'Techlight IT Institute.com',
+        'facebook.com/Techlight IT Institute',
+        '0x3755c754583dd209',
+    ];
+
+    const haystack = `${ci?.email || ''} ${ci?.phone || ''} ${ci?.address || ''} ${sl?.facebook || ''} ${sl?.whatsapp || ''} ${map}`;
+    const isStale = oldMarkers.some((m) => haystack.includes(m));
+
+    if (isStale) {
+        await Design.deleteOne({ section: 'contact' });
+    }
+};
+
+/**
  * Get design by section
  */
 const getDesignBySection = async (section: string): Promise<IDesign | null> => {
+    // Auto-cleanup stale contact data once per request (idempotent)
+    if (section === 'contact') {
+        await cleanupStaleContactData();
+    }
+
     let design = await Design.findBySection(section);
 
     // If hero section doesn't exist, create default
@@ -54,7 +90,8 @@ const getDesignBySection = async (section: string): Promise<IDesign | null> => {
         });
     }
 
-    // If contact section doesn't exist, create default
+    // If contact section doesn't exist, create default with DEMO placeholders.
+    // Real values must be set via admin panel.
     if (!design && section === 'contact') {
         design = await Design.create({
             section: 'contact',
@@ -65,34 +102,35 @@ const getDesignBySection = async (section: string): Promise<IDesign | null> => {
                     title1: "Let's ",
                     title1Bn: 'আমাদের সাথে ',
                     title2: 'Connect',
-                    title2Bn: 'যোগাযোগ করুন',
-                    subtitle: 'Have questions? We would love to hear from you. Send us a message and we will respond as soon as possible.',
-                    subtitleBn: 'কোনো প্রশ্ন আছে? আমাদের মেসেজ পাঠান, আমরা যত তাড়াতাড়ি সম্ভব উত্তর দেব।'
+                    title2Bn: 'কথা বলুন',
+                    subtitle: "Have questions or feedback? We're here to listen. Reach out through any channel below.",
+                    subtitleBn: 'প্রশ্ন আছে? পরামর্শ চান? আমরা আপনার কথা শুনতে প্রস্তুত। যেকোনো মাধ্যমে যোগাযোগ করুন।'
                 },
                 contactInfo: {
-                    email: 'info@Techlight IT Institute.com',
-                    phone: '+88 01730481212',
-                    address: 'Daisy Garden, House 14 (Level-5), Block A, Banasree, Dhaka',
-                    addressBn: 'ডেইজি গার্ডেন, বাড়ি ১৪ (লেভেল-৫), ব্লক এ, বনশ্রী, ঢাকা',
+                    email: 'demo@example.com',
+                    phone: '+880 1XXX-XXXXXX',
+                    address: 'Your City, Country',
+                    addressBn: 'আপনার শহর, দেশ',
                     officeHours: 'Sat - Thu: 10:00 AM - 6:00 PM',
-                    officeHoursBn: 'শনি - বৃহস্পতি: সকাল ১০টা - সন্ধ্যা ৬টা'
+                    officeHoursBn: 'শনি - বৃহঃ: সকাল ১০টা - সন্ধ্যা ৬টা'
                 },
                 socialLinks: {
-                    facebook: 'https://www.facebook.com/Techlight IT Institute',
-                    youtube: 'https://www.youtube.com/@Techlight IT Institute',
-                    linkedin: 'https://www.linkedin.com/company/Techlight IT Institute',
-                    whatsapp: 'https://wa.me/8801730481212',
-                    instagram: 'https://www.instagram.com/Techlight IT Institute/'
+                    facebook: '#',
+                    youtube: '#',
+                    linkedin: '#',
+                    whatsapp: '#',
+                    instagram: '#'
                 },
                 whatsappSection: {
-                    title: 'Need Quick Help?',
-                    titleBn: 'দ্রুত সাহায্য দরকার?',
-                    description: 'Chat with us on WhatsApp for instant support and answers to your questions.',
-                    descriptionBn: 'তাৎক্ষণিক সাপোর্টের জন্য হোয়াটসঅ্যাপে আমাদের সাথে চ্যাট করুন।',
-                    buttonText: 'Chat on WhatsApp',
-                    buttonTextBn: 'হোয়াটসঅ্যাপে চ্যাট করুন'
+                    title: 'Instant Chat',
+                    titleBn: 'তাৎক্ষণিক চ্যাট',
+                    description: 'Chat with us on WhatsApp for the fastest response and instant answers.',
+                    descriptionBn: 'WhatsApp এ আমাদের সাথে চ্যাট করুন — সবচেয়ে দ্রুত সাড়া পাবেন।',
+                    buttonText: 'Start Chat',
+                    buttonTextBn: 'চ্যাট শুরু করুন'
                 },
-                mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.8986834879085!2d90.41723!3d23.7656976!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c754583dd209%3A0xdd0c5fcc7d2d3836!2sDaisy%20Garden!5e0!3m2!1sen!2sbd!4v1704532086149!5m2!1sen!2sbd'
+                // Generic Bangladesh view as demo — replace via admin panel
+                mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d465004.5!2d90.3!3d23.78!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sbd!4v1704532086149!5m2!1sen!2sbd'
             },
             isActive: true
         });
