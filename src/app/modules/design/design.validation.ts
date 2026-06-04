@@ -6,6 +6,20 @@ const updateContactSchema = z.object({
     }),
 });
 
+const updateHeroSchema = z.object({
+    body: z.object({
+        heroContent: z.record(z.string(), z.any()).optional(),
+    }),
+});
+
+const updateProvideSchema = z.object({
+    body: z.object({
+        provideContent: z.record(z.string(), z.any()).optional(),
+    }),
+});
+
 export const DesignValidation = {
     updateContactSchema,
+    updateHeroSchema,
+    updateProvideSchema,
 };

@@ -35,7 +35,41 @@ export interface IContactContent {
     mapEmbedUrl?: string;
 }
 
+// ==================== Home: Hero Section ====================
+export interface IHeroStat {
+    value?: string;
+    label?: string;
+}
+
+export interface IHeroContent {
+    badge?: string;
+    title?: string;
+    titleHighlight?: string;
+    description?: string;
+    primaryButtonText?: string;
+    primaryButtonLink?: string;
+    stats?: IHeroStat[];
+}
+
+// ==================== Home: What We Provide Section ====================
+export interface IProvideFeature {
+    title?: string;
+    desc?: string;
+}
+
+export interface IProvideContent {
+    badge?: string;
+    title?: string;
+    titleHighlight?: string;
+    description?: string;
+    buttonText?: string;
+    buttonLink?: string;
+    features?: IProvideFeature[];
+}
+
 export interface IDesign {
-    key: string; // e.g. 'contact'
+    key: string; // e.g. 'contact' | 'hero' | 'provide'
     contactContent?: IContactContent;
+    heroContent?: IHeroContent;
+    provideContent?: IProvideContent;
 }
