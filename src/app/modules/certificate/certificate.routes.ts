@@ -1,7 +1,6 @@
 // ===================================================================
 // Techlight IT Institute LMS - Certificate Routes
-// API routes for Certificate module
-// সার্টিফিকেট রাউটস
+// API routes for the standalone certificate.
 // ===================================================================
 
 import express from 'express';
@@ -12,13 +11,16 @@ import validateRequest from '../../middlewares/validateRequest';
 
 const router = express.Router();
 
-// ==================== Student Route ====================
-// Get logged-in student's certificates (must come before '/:id')
-router.get('/my', authMiddleware, CertificateController.getMyCertificates);
+// ==================== Public Routes ====================
+// Search certificates by phone / email / studentId
+router.get('/search', CertificateController.searchCertificates);
 
-// ==================== Public Route ====================
 // Verify a certificate by its number
 router.get('/verify/:number', CertificateController.verifyCertificate);
+
+// ==================== Student Route ====================
+// Get logged-in student's certificates (matched by email)
+router.get('/my', authMiddleware, CertificateController.getMyCertificates);
 
 // ==================== Admin Routes ====================
 router.post(

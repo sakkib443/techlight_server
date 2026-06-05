@@ -67,9 +67,15 @@ export interface IProvideContent {
     features?: IProvideFeature[];
 }
 
+// ==================== About Page ====================
+// Stored as a flexible object (single-language / English). Shape is mirrored
+// by the admin editor and the public About page defaults.
+export type IAboutContent = Record<string, unknown>;
+
 export interface IDesign {
-    key: string; // e.g. 'contact' | 'hero' | 'provide'
+    key: string; // e.g. 'contact' | 'hero' | 'provide' | 'about'
     contactContent?: IContactContent;
     heroContent?: IHeroContent;
     provideContent?: IProvideContent;
+    aboutContent?: IAboutContent;
 }

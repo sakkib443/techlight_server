@@ -1,9 +1,15 @@
 import { Design } from './design.model';
-import { IContactContent, IHeroContent, IProvideContent } from './design.interface';
+import {
+    IContactContent,
+    IHeroContent,
+    IProvideContent,
+    IAboutContent,
+} from './design.interface';
 
 const CONTACT_KEY = 'contact';
 const HERO_KEY = 'hero';
 const PROVIDE_KEY = 'provide';
+const ABOUT_KEY = 'about';
 
 // ==================== Contact ====================
 const getContactContent = async (): Promise<{ contactContent: IContactContent }> => {
@@ -65,6 +71,26 @@ const updateProvideContent = async (
     return { provideContent: (doc?.provideContent || {}) as IProvideContent };
 };
 
+// ==================== About Page ====================
+const getAboutContent = async (): Promise<{ aboutContent: IAboutContent }> => {
+    let doc = await Design.findOne({ key: ABOUT_KEY });
+    if (!doc) {
+        doc = await Design.create({ key: ABOUT_KEY, aboutContent: {} });
+    }
+    return { aboutContent: (doc.aboutContent || {}) as IAboutContent };
+};
+
+const updateAboutContent = async (
+    aboutContent: IAboutContent
+): Promise<{ aboutContent: IAboutContent }> => {
+    const doc = await Design.findOneAndUpdate(
+        { key: ABOUT_KEY },
+        { $set: { aboutContent } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+    return { aboutContent: (doc?.aboutContent || {}) as IAboutContent };
+};
+
 export const DesignService = {
     getContactContent,
     updateContactContent,
@@ -72,4 +98,6 @@ export const DesignService = {
     updateHeroContent,
     getProvideContent,
     updateProvideContent,
+    getAboutContent,
+    updateAboutContent,
 };

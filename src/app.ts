@@ -33,10 +33,13 @@ import { CouponRoutes } from './app/modules/coupon/coupon.routes';
 import { BlogRoutes } from './app/modules/blog/blog.routes';
 import { BatchRoutes } from './app/modules/batch/batch.routes';
 import { CertificateRoutes } from './app/modules/certificate/certificate.routes';
+import { CertificateBatchRoutes } from './app/modules/certificateBatch/certificateBatch.routes';
 import { LiveClassRoutes } from './app/modules/liveClass/liveClass.routes';
 import { InstructorRoutes } from './app/modules/instructor/instructor.routes';
 import { DesignRoutes } from './app/modules/design/design.routes';
 import { ContactMessageRoutes } from './app/modules/contactMessage/contactMessage.routes';
+import { TestimonialRoutes } from './app/modules/testimonial/testimonial.routes';
+import { FaqRoutes } from './app/modules/faq/faq.routes';
 
 
 // ==================== App Initialization ====================
@@ -165,8 +168,11 @@ app.use('/api/blogs', BlogRoutes);
 // Batch routes (course batches for online courses)
 app.use('/api/batches', BatchRoutes);
 
-// Certificate routes (student certificates - issue, list, verify)
+// Certificate routes (standalone certificates - issue, search, verify)
 app.use('/api/certificates', CertificateRoutes);
+
+// Certificate Batch routes (lightweight batches for certificate issuance)
+app.use('/api/certificate-batches', CertificateBatchRoutes);
 
 // Live Class routes (live classes for batches)
 app.use('/api/live-classes', LiveClassRoutes);
@@ -180,6 +186,12 @@ app.use('/api/designs', DesignRoutes);
 
 // Contact Message routes (public submit + admin view)
 app.use('/api/contact', ContactMessageRoutes);
+
+// Testimonial routes
+app.use('/api/testimonials', TestimonialRoutes);
+
+// FAQ routes (public list + admin CRUD)
+app.use('/api/faqs', FaqRoutes);
 
 // ==================== Error Handling ====================
 // 404 Not Found handler (must be after all routes)

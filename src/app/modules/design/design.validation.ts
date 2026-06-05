@@ -18,8 +18,15 @@ const updateProvideSchema = z.object({
     }),
 });
 
+const updateAboutSchema = z.object({
+    body: z.object({
+        aboutContent: z.record(z.string(), z.any()).optional(),
+    }),
+});
+
 export const DesignValidation = {
     updateContactSchema,
     updateHeroSchema,
     updateProvideSchema,
+    updateAboutSchema,
 };

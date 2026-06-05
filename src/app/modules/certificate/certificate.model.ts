@@ -1,15 +1,11 @@
 // ===================================================================
 // Techlight IT Institute LMS - Certificate Model
-// MongoDB Certificate Schema with Mongoose
-// সার্টিফিকেট কালেকশনের Mongoose স্কিমা
+// Standalone certificate schema (typed student info + batch snapshot).
 // ===================================================================
 
 import { Schema, model } from 'mongoose';
 import { ICertificate, CertificateModel } from './certificate.interface';
 
-/**
- * Certificate Schema Definition
- */
 const certificateSchema = new Schema<ICertificate, CertificateModel>(
     {
         // ==================== Identity ====================
@@ -22,49 +18,54 @@ const certificateSchema = new Schema<ICertificate, CertificateModel>(
             index: true,
         },
 
-        // ==================== Core References ====================
-        student: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-            required: [true, 'Student reference is required'],
-            index: true,
-        },
-        course: {
-            type: Schema.Types.ObjectId,
-            ref: 'Course',
-            required: [true, 'Course reference is required'],
-            index: true,
-        },
-        enrollment: {
-            type: Schema.Types.ObjectId,
-            ref: 'Enrollment',
-        },
-        batch: {
-            type: Schema.Types.ObjectId,
-            ref: 'Batch',
-        },
-
-        // ==================== Certificate Info ====================
-        title: {
-            type: String,
-            required: [true, 'Certificate title is required'],
-            trim: true,
-        },
+        // ==================== Student info ====================
         studentName: {
             type: String,
             required: [true, 'Student name is required'],
             trim: true,
         },
+        phone: {
+            type: String,
+            required: [true, 'Phone number is required'],
+            trim: true,
+            index: true,
+        },
+        email: {
+            type: String,
+            trim: true,
+            lowercase: true,
+            default: '',
+            index: true,
+        },
+        studentId: {
+            type: String,
+            required: [true, 'Student ID is required'],
+            trim: true,
+            index: true,
+        },
+
+        // ==================== Course / result ====================
         courseName: {
             type: String,
-            required: [true, 'Course name is required'],
             trim: true,
+            default: '',
         },
         grade: {
             type: String,
             trim: true,
             default: '',
         },
+
+        // ==================== Batch (link + snapshot) ====================
+        certificateBatch: {
+            type: Schema.Types.ObjectId,
+            ref: 'CertificateBatch',
+        },
+        batchNumber: { type: String, trim: true, default: '' },
+        batchName: { type: String, trim: true, default: '' },
+        mentorName: { type: String, trim: true, default: '' },
+        startDate: { type: Date },
+        endDate: { type: Date },
 
         // ==================== Issuance ====================
         issuedBy: {
@@ -83,10 +84,6 @@ const certificateSchema = new Schema<ICertificate, CertificateModel>(
             },
             default: 'issued',
         },
-        fileUrl: {
-            type: String,
-            default: '',
-        },
     },
     {
         timestamps: true,
@@ -101,9 +98,7 @@ const certificateSchema = new Schema<ICertificate, CertificateModel>(
 );
 
 // ==================== Indexes ====================
-// One certificate per student per course
-certificateSchema.index({ student: 1, course: 1 }, { unique: true });
 certificateSchema.index({ issueDate: -1 });
+certificateSchema.index({ studentName: 'text', studentId: 'text', phone: 'text' });
 
-// ==================== Export Model ====================
 export const Certificate = model<ICertificate, CertificateModel>('Certificate', certificateSchema);

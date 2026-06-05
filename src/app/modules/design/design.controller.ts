@@ -66,6 +66,27 @@ const updateProvideContent = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// ==================== About Page ====================
+const getAboutContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.getAboutContent();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'About content fetched successfully',
+        data: result,
+    });
+});
+
+const updateAboutContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.updateAboutContent(req.body.aboutContent || {});
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'About content updated successfully',
+        data: result,
+    });
+});
+
 export const DesignController = {
     getContactContent,
     updateContactContent,
@@ -73,4 +94,6 @@ export const DesignController = {
     updateHeroContent,
     getProvideContent,
     updateProvideContent,
+    getAboutContent,
+    updateAboutContent,
 };

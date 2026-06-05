@@ -34,7 +34,7 @@ const courseSchema = new Schema<ICourse, CourseModel>(
         },
         description: {
             type: String,
-            required: [true, 'Description is required'],
+            default: '',
         },
         descriptionBn: {
             type: String,

@@ -37,4 +37,14 @@ router.patch(
     DesignController.updateProvideContent
 );
 
+// ==================== About Page ====================
+router.get('/about', DesignController.getAboutContent);
+router.patch(
+    '/about',
+    authMiddleware,
+    checkRole('admin'),
+    validateRequest(DesignValidation.updateAboutSchema),
+    DesignController.updateAboutContent
+);
+
 export const DesignRoutes = router;

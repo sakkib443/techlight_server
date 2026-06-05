@@ -5,7 +5,10 @@ const instructorSchema = new Schema<IInstructor>(
     {
         name: { type: String, required: true },
         designation: { type: String },
+        subject: { type: String },
         bio: { type: String },
+        details: { type: String },
+        lifeJourney: { type: String },
         image: { type: String },
         email: { type: String },
         phone: { type: String },
@@ -16,6 +19,12 @@ const instructorSchema = new Schema<IInstructor>(
             github: { type: String },
         },
         specialization: [{ type: String }],
+        education: [{ type: String }],
+        workExperience: [{ type: String }],
+        trainingExperience: {
+            years: { type: String },
+            students: { type: String },
+        },
         isActive: { type: Boolean, default: true },
         isDeleted: { type: Boolean, default: false },
         user: { type: Schema.Types.ObjectId, ref: 'User' },

@@ -1,7 +1,6 @@
 // ===================================================================
 // Techlight IT Institute LMS - Certificate Controller
-// HTTP request handlers for Certificate
-// সার্টিফিকেট কন্ট্রোলার
+// HTTP request handlers for the standalone certificate.
 // ===================================================================
 
 import { Request, Response } from 'express';
@@ -26,7 +25,7 @@ const issueCertificate = catchAsync(async (req: Request, res: Response) => {
 
 // ==================== Get All Certificates (Admin) ====================
 const getAllCertificates = catchAsync(async (req: Request, res: Response) => {
-    const filters = pick(req.query, ['student', 'course', 'batch', 'status', 'searchTerm']);
+    const filters = pick(req.query, ['status', 'certificateBatch', 'searchTerm']);
     const options = pick(req.query, ['page', 'limit', 'sortBy', 'sortOrder']);
 
     const result = await CertificateService.getAllCertificates(filters, {
@@ -48,9 +47,27 @@ const getAllCertificates = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// ==================== Search Certificates (Public) ====================
+const searchCertificates = catchAsync(async (req: Request, res: Response) => {
+    const { phone, email, studentId } = pick(req.query, ['phone', 'email', 'studentId']) as {
+        phone?: string;
+        email?: string;
+        studentId?: string;
+    };
+
+    const result = await CertificateService.searchCertificates({ phone, email, studentId });
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Certificates retrieved successfully',
+        data: result,
+    });
+});
+
 // ==================== Get My Certificates (Student) ====================
 const getMyCertificates = catchAsync(async (req: Request, res: Response) => {
-    const result = await CertificateService.getMyCertificates(req.user!.userId);
+    const result = await CertificateService.getMyCertificates(req.user!.email);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -106,6 +123,7 @@ const deleteCertificate = catchAsync(async (req: Request, res: Response) => {
 export const CertificateController = {
     issueCertificate,
     getAllCertificates,
+    searchCertificates,
     getMyCertificates,
     getCertificateById,
     verifyCertificate,
