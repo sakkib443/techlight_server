@@ -3,6 +3,7 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { DesignService } from './design.service';
 
+// ==================== Contact ====================
 const getContactContent = catchAsync(async (req: Request, res: Response) => {
     const result = await DesignService.getContactContent();
     sendResponse(res, {
@@ -14,8 +15,7 @@ const getContactContent = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateContactContent = catchAsync(async (req: Request, res: Response) => {
-    const { contactContent } = req.body;
-    const result = await DesignService.updateContactContent(contactContent || {});
+    const result = await DesignService.updateContactContent(req.body.contactContent || {});
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -24,23 +24,65 @@ const updateContactContent = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const getHomeContent = catchAsync(async (req: Request, res: Response) => {
-    const result = await DesignService.getHomeContent();
+// ==================== Home: Hero ====================
+const getHeroContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.getHeroContent();
     sendResponse(res, {
         statusCode: 200,
         success: true,
-        message: 'Home content fetched successfully',
+        message: 'Hero content fetched successfully',
         data: result,
     });
 });
 
-const updateHomeContent = catchAsync(async (req: Request, res: Response) => {
-    const { homeContent } = req.body;
-    const result = await DesignService.updateHomeContent(homeContent || {});
+const updateHeroContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.updateHeroContent(req.body.heroContent || {});
     sendResponse(res, {
         statusCode: 200,
         success: true,
-        message: 'Home content updated successfully',
+        message: 'Hero content updated successfully',
+        data: result,
+    });
+});
+
+// ==================== Home: What We Provide ====================
+const getProvideContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.getProvideContent();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Provide content fetched successfully',
+        data: result,
+    });
+});
+
+const updateProvideContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.updateProvideContent(req.body.provideContent || {});
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Provide content updated successfully',
+        data: result,
+    });
+});
+
+// ==================== About Page ====================
+const getAboutContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.getAboutContent();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'About content fetched successfully',
+        data: result,
+    });
+});
+
+const updateAboutContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.updateAboutContent(req.body.aboutContent || {});
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'About content updated successfully',
         data: result,
     });
 });
@@ -48,6 +90,10 @@ const updateHomeContent = catchAsync(async (req: Request, res: Response) => {
 export const DesignController = {
     getContactContent,
     updateContactContent,
-    getHomeContent,
-    updateHomeContent,
+    getHeroContent,
+    updateHeroContent,
+    getProvideContent,
+    updateProvideContent,
+    getAboutContent,
+    updateAboutContent,
 };

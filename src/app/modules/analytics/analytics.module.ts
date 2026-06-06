@@ -14,6 +14,7 @@ import { User } from '../user/user.model';
 import { Course } from '../course/course.model';
 import { Lesson } from '../lesson/lesson.model';
 import { Enrollment } from '../enrollment/enrollment.model';
+import { Certificate } from '../certificate/certificate.model';
 
 // ==================== SERVICE ====================
 const AnalyticsService = {
@@ -49,6 +50,8 @@ const AnalyticsService = {
         monthlyRevenue: number;
         // Category Stats
         totalCategories: number;
+        // Certificate Stats
+        totalCertificates: number;
         // Engagement Stats
         totalLikes: number;
     }> {
@@ -85,6 +88,8 @@ const AnalyticsService = {
             totalRevenueResult,
             todayRevenueResult,
             monthlyRevenueResult,
+            // Certificate count
+            totalCertificates,
         ] = await Promise.all([
             // User queries
             User.countDocuments({ isDeleted: false }),
@@ -121,6 +126,8 @@ const AnalyticsService = {
                 { $match: { paymentStatus: 'completed', orderDate: { $gte: firstDayOfMonth } } },
                 { $group: { _id: null, total: { $sum: '$totalAmount' } } },
             ]),
+            // Certificate count
+            Certificate.countDocuments({}),
         ]);
 
         return {
@@ -151,6 +158,8 @@ const AnalyticsService = {
             monthlyRevenue: monthlyRevenueResult[0]?.total || 0,
             // Category Stats
             totalCategories,
+            // Certificate Stats
+            totalCertificates,
             // Engagement
             totalLikes: courseLikes[0]?.total || 0,
 

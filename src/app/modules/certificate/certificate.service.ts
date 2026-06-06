@@ -1,23 +1,26 @@
 // ===================================================================
 // Techlight IT Institute LMS - Certificate Service
-// Business logic for Certificate operations
-// সার্টিফিকেট সার্ভিস - ব্যবসায়িক লজিক
+// Business logic for the standalone certificate.
 // ===================================================================
 
-import { ICertificate, ICertificateFilters } from './certificate.interface';
+import { ICertificate, ICertificateFilters, ICertificateSearch } from './certificate.interface';
 import { Certificate } from './certificate.model';
-import { Enrollment } from '../enrollment/enrollment.model';
-import { Course } from '../course/course.model';
-import { User } from '../user/user.model';
+import { CertificateBatch } from '../certificateBatch/certificateBatch.model';
 import AppError from '../../utils/AppError';
 
 interface IIssueCertificatePayload {
-    enrollmentId?: string;
-    studentId?: string;
-    courseId?: string;
-    batchId?: string;
-    title?: string;
+    studentName: string;
+    phone: string;
+    email?: string;
+    studentId: string;
+    courseName?: string;
     grade?: string;
+    certificateBatch?: string;
+    batchNumber?: string;
+    batchName?: string;
+    mentorName?: string;
+    startDate?: string;
+    endDate?: string;
     issueDate?: string;
     issuedBy?: string;
 }
@@ -43,83 +46,56 @@ const generateCertificateNumber = async (): Promise<string> => {
     return `${prefix}${String(seq).padStart(4, '0')}`;
 };
 
-// ==================== Issue Certificate ====================
+// ==================== Issue Certificate (Admin) ====================
 const issueCertificate = async (payload: IIssueCertificatePayload): Promise<ICertificate> => {
-    let studentId = payload.studentId;
-    let courseId = payload.courseId;
-    let batchId = payload.batchId;
+    // Snapshot batch fields if a batch is linked
+    let batchSnapshot: Partial<ICertificate> = {
+        batchNumber: payload.batchNumber,
+        batchName: payload.batchName,
+        mentorName: payload.mentorName,
+        startDate: payload.startDate ? new Date(payload.startDate) : undefined,
+        endDate: payload.endDate ? new Date(payload.endDate) : undefined,
+    };
+    let courseName = payload.courseName;
 
-    // Resolve from enrollment if provided
-    let enrollment = null;
-    if (payload.enrollmentId) {
-        enrollment = await Enrollment.findById(payload.enrollmentId);
-        if (!enrollment) {
-            throw new AppError(404, 'Enrollment not found');
+    if (payload.certificateBatch) {
+        const batch = await CertificateBatch.findById(payload.certificateBatch);
+        if (!batch) {
+            throw new AppError(404, 'Selected batch not found');
         }
-        studentId = enrollment.student.toString();
-        courseId = enrollment.course.toString();
-        if (enrollment.batch && !batchId) {
-            batchId = enrollment.batch.toString();
-        }
+        batchSnapshot = {
+            batchNumber: batch.batchNumber,
+            batchName: batch.batchName,
+            mentorName: batch.mentorName,
+            startDate: batch.startDate,
+            endDate: batch.endDate,
+        };
+        if (!courseName) courseName = batch.courseName;
     }
 
-    if (!studentId || !courseId) {
-        throw new AppError(400, 'Student and course are required to issue a certificate');
-    }
-
-    // Validate student and course exist
-    const student = await User.findById(studentId);
-    if (!student) {
-        throw new AppError(404, 'Student not found');
-    }
-
-    const course = await Course.findById(courseId);
-    if (!course) {
-        throw new AppError(404, 'Course not found');
-    }
-
-    // Prevent duplicate certificate for the same student + course
-    const existing = await Certificate.findOne({ student: studentId, course: courseId });
-    if (existing) {
-        throw new AppError(400, 'A certificate has already been issued for this student and course');
-    }
-
-    // Fall back to finding the enrollment (for linking) if not passed
-    if (!enrollment) {
-        enrollment = await Enrollment.findOne({ student: studentId, course: courseId });
-        if (enrollment?.batch && !batchId) {
-            batchId = enrollment.batch.toString();
-        }
+    // Prevent the exact same certificate twice (same student id + batch)
+    const existing = await Certificate.findOne({
+        studentId: payload.studentId,
+        certificateBatch: payload.certificateBatch || undefined,
+    });
+    if (existing && payload.certificateBatch) {
+        throw new AppError(400, 'A certificate already exists for this student in this batch');
     }
 
     const certificateNumber = await generateCertificateNumber();
-    const studentName = `${student.firstName} ${student.lastName || ''}`.trim();
 
     const certificate = await Certificate.create({
         certificateNumber,
-        student: studentId,
-        course: courseId,
-        enrollment: enrollment?._id,
-        batch: batchId || undefined,
-        title: payload.title?.trim() || course.title,
-        studentName,
-        courseName: course.title,
-        grade: payload.grade,
+        studentName: payload.studentName.trim(),
+        phone: payload.phone.trim(),
+        email: payload.email?.trim() || '',
+        studentId: payload.studentId.trim(),
+        courseName: courseName || '',
+        grade: payload.grade || '',
+        certificateBatch: payload.certificateBatch || undefined,
+        ...batchSnapshot,
         issuedBy: payload.issuedBy,
         issueDate: payload.issueDate ? new Date(payload.issueDate) : new Date(),
-    });
-
-    // Link certificate to the enrollment
-    if (enrollment) {
-        await Enrollment.findByIdAndUpdate(enrollment._id, {
-            certificateId: certificate._id,
-            certificateEligible: true,
-        });
-    }
-
-    // Link certificate to the user
-    await User.findByIdAndUpdate(studentId, {
-        $addToSet: { certificates: certificate._id },
     });
 
     return certificate;
@@ -130,31 +106,28 @@ const getAllCertificates = async (
     filters: ICertificateFilters,
     options: { page?: number; limit?: number; sortBy?: string; sortOrder?: 'asc' | 'desc' }
 ): Promise<{ data: ICertificate[]; meta: { total: number; page: number; limit: number } }> => {
-    const { student, course, batch, status, searchTerm } = filters;
+    const { status, certificateBatch, searchTerm } = filters;
     const { page = 1, limit = 10, sortBy = 'issueDate', sortOrder = 'desc' } = options;
 
     const query: Record<string, unknown> = {};
 
-    if (student) query.student = student;
-    if (course) query.course = course;
-    if (batch) query.batch = batch;
     if (status) query.status = status;
+    if (certificateBatch) query.certificateBatch = certificateBatch;
 
     if (searchTerm) {
         query.$or = [
             { certificateNumber: { $regex: searchTerm, $options: 'i' } },
             { studentName: { $regex: searchTerm, $options: 'i' } },
+            { studentId: { $regex: searchTerm, $options: 'i' } },
+            { phone: { $regex: searchTerm, $options: 'i' } },
+            { email: { $regex: searchTerm, $options: 'i' } },
             { courseName: { $regex: searchTerm, $options: 'i' } },
-            { title: { $regex: searchTerm, $options: 'i' } },
         ];
     }
 
     const total = await Certificate.countDocuments(query);
     const certificates = await Certificate.find(query)
-        .populate('student', 'firstName lastName email avatar')
-        .populate('course', 'title slug thumbnail')
-        .populate('batch', 'batchName batchCode')
-        .populate('issuedBy', 'firstName lastName')
+        .populate('certificateBatch', 'batchName batchNumber mentorName startDate endDate')
         .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 })
         .skip((page - 1) * limit)
         .limit(limit);
@@ -165,23 +138,40 @@ const getAllCertificates = async (
     };
 };
 
-// ==================== Get My Certificates (Student) ====================
-const getMyCertificates = async (studentId: string): Promise<ICertificate[]> => {
-    const certificates = await Certificate.find({ student: studentId, status: 'issued' })
-        .populate('course', 'title slug thumbnail')
-        .populate('batch', 'batchName batchCode')
-        .sort({ issueDate: -1 });
+// ==================== Search Certificates (Public) ====================
+// Match by phone OR email OR studentId — any provided field.
+const searchCertificates = async (payload: ICertificateSearch): Promise<ICertificate[]> => {
+    const { phone, email, studentId } = payload;
 
-    return certificates;
+    const or: Record<string, unknown>[] = [];
+    if (phone) or.push({ phone: { $regex: phone.trim(), $options: 'i' } });
+    if (email) or.push({ email: { $regex: email.trim(), $options: 'i' } });
+    if (studentId) or.push({ studentId: { $regex: studentId.trim(), $options: 'i' } });
+
+    if (or.length === 0) {
+        return [];
+    }
+
+    return Certificate.find({ status: 'issued', $or: or })
+        .populate('certificateBatch', 'batchName batchNumber mentorName startDate endDate')
+        .sort({ issueDate: -1 });
+};
+
+// ==================== Get My Certificates (Student) ====================
+// Standalone certs are matched to the logged-in user by email.
+const getMyCertificates = async (email: string): Promise<ICertificate[]> => {
+    if (!email) return [];
+    return Certificate.find({ email: email.toLowerCase().trim(), status: 'issued' })
+        .populate('certificateBatch', 'batchName batchNumber mentorName startDate endDate')
+        .sort({ issueDate: -1 });
 };
 
 // ==================== Get Single Certificate ====================
 const getCertificateById = async (id: string): Promise<ICertificate> => {
-    const certificate = await Certificate.findById(id)
-        .populate('student', 'firstName lastName email avatar')
-        .populate('course', 'title slug thumbnail')
-        .populate('batch', 'batchName batchCode')
-        .populate('issuedBy', 'firstName lastName');
+    const certificate = await Certificate.findById(id).populate(
+        'certificateBatch',
+        'batchName batchNumber mentorName startDate endDate'
+    );
 
     if (!certificate) {
         throw new AppError(404, 'Certificate not found');
@@ -193,9 +183,7 @@ const getCertificateById = async (id: string): Promise<ICertificate> => {
 const verifyCertificate = async (certificateNumber: string): Promise<ICertificate> => {
     const certificate = await Certificate.findOne({
         certificateNumber: certificateNumber.toUpperCase().trim(),
-    })
-        .populate('course', 'title')
-        .populate('batch', 'batchName batchCode');
+    }).populate('certificateBatch', 'batchName batchNumber mentorName startDate endDate');
 
     if (!certificate) {
         throw new AppError(404, 'Certificate not found. Please check the certificate number.');
@@ -205,13 +193,15 @@ const verifyCertificate = async (certificateNumber: string): Promise<ICertificat
 
 // ==================== Update Certificate (Admin) ====================
 const updateCertificate = async (id: string, payload: Partial<ICertificate>): Promise<ICertificate> => {
-    const certificate = await Certificate.findByIdAndUpdate(id, payload, {
+    const data: Record<string, unknown> = { ...payload };
+    if (payload.startDate) data.startDate = new Date(payload.startDate);
+    if (payload.endDate) data.endDate = new Date(payload.endDate);
+    if (payload.issueDate) data.issueDate = new Date(payload.issueDate);
+
+    const certificate = await Certificate.findByIdAndUpdate(id, data, {
         new: true,
         runValidators: true,
-    })
-        .populate('student', 'firstName lastName email avatar')
-        .populate('course', 'title slug thumbnail')
-        .populate('batch', 'batchName batchCode');
+    }).populate('certificateBatch', 'batchName batchNumber mentorName startDate endDate');
 
     if (!certificate) {
         throw new AppError(404, 'Certificate not found');
@@ -225,20 +215,6 @@ const deleteCertificate = async (id: string): Promise<ICertificate> => {
     if (!certificate) {
         throw new AppError(404, 'Certificate not found');
     }
-
-    // Unlink from enrollment
-    if (certificate.enrollment) {
-        await Enrollment.findByIdAndUpdate(certificate.enrollment, {
-            $unset: { certificateId: 1 },
-            $set: { certificateEligible: false },
-        });
-    }
-
-    // Unlink from user
-    await User.findByIdAndUpdate(certificate.student, {
-        $pull: { certificates: certificate._id },
-    });
-
     return certificate;
 };
 
@@ -246,6 +222,7 @@ export const CertificateService = {
     generateCertificateNumber,
     issueCertificate,
     getAllCertificates,
+    searchCertificates,
     getMyCertificates,
     getCertificateById,
     verifyCertificate,

@@ -26,8 +26,10 @@ const createCourseSchema = z.object({
             .or(z.literal('')),
 
         description: z
-            .string({ required_error: 'Description is required' })
-            .min(50, 'Description must be at least 50 characters'),
+            .string()
+            .min(50, 'Description must be at least 50 characters')
+            .optional()
+            .or(z.literal('')),
 
         descriptionBn: z
             .string()

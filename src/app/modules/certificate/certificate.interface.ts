@@ -1,61 +1,64 @@
 // ===================================================================
 // Techlight IT Institute LMS - Certificate Interface
-// Certificate module TypeScript interface definitions
-// সার্টিফিকেট মডিউলের TypeScript interface definitions
+// Standalone certificate — issued by admin from typed info + a batch.
+// No dependency on registered users / courses / enrollments.
 // ===================================================================
 
 import { Model, Types } from 'mongoose';
 
-/**
- * Certificate Status Types
- */
 export type TCertificateStatus = 'issued' | 'revoked';
 
 /**
- * ICertificate - Main Certificate Interface
- * Student কে issue করা certificate data
+ * ICertificate - Standalone certificate
+ * Admin types the student info and (optionally) links a CertificateBatch
+ * whose common fields (mentor, dates, batch no.) are snapshotted in.
  */
 export interface ICertificate {
     _id?: Types.ObjectId;
 
     // ==================== Identity ====================
-    certificateNumber: string;        // Unique, e.g. "TII-2026-0001"
+    certificateNumber: string;            // Unique, auto e.g. "TII-2026-0001"
 
-    // ==================== Core References ====================
-    student: Types.ObjectId;          // User (student) reference
-    course: Types.ObjectId;           // Course reference
-    enrollment?: Types.ObjectId;      // Enrollment reference (source)
-    batch?: Types.ObjectId;           // Batch reference (optional)
+    // ==================== Student info (typed) ====================
+    studentName: string;
+    phone: string;                        // searchable
+    email?: string;                       // searchable
+    studentId: string;                    // academy ID, searchable e.g. "TECH-2024-001"
 
-    // ==================== Certificate Info ====================
-    title: string;                    // Certificate title (default = course title)
-    studentName: string;              // Snapshot of student name (integrity)
-    courseName: string;               // Snapshot of course name (integrity)
-    grade?: string;                   // Optional grade / result
+    // ==================== Course / result ====================
+    courseName?: string;                  // program name (may come from batch)
+    grade?: string;
+
+    // ==================== Batch (optional link + snapshot) ====================
+    certificateBatch?: Types.ObjectId;    // CertificateBatch reference
+    batchNumber?: string;                 // snapshot
+    batchName?: string;                   // snapshot
+    mentorName?: string;                  // snapshot
+    startDate?: Date;                     // snapshot
+    endDate?: Date;                       // snapshot
 
     // ==================== Issuance ====================
-    issuedBy?: Types.ObjectId;        // Admin who issued it
-    issueDate: Date;                  // When it was issued
-    status: TCertificateStatus;       // issued | revoked
-    fileUrl?: string;                 // Optional stored file URL (manual upload path)
+    issuedBy?: Types.ObjectId;            // Admin who issued it
+    issueDate: Date;
+    status: TCertificateStatus;
 
-    // ==================== Timestamps ====================
     createdAt?: Date;
     updatedAt?: Date;
 }
 
-/**
- * ICertificateFilters - Query Filters
- */
 export interface ICertificateFilters {
-    student?: string;
-    course?: string;
-    batch?: string;
     status?: TCertificateStatus;
+    certificateBatch?: string;
     searchTerm?: string;
 }
 
 /**
- * CertificateModel - Mongoose Model Type
+ * Public search payload (phone OR email OR studentId).
  */
+export interface ICertificateSearch {
+    phone?: string;
+    email?: string;
+    studentId?: string;
+}
+
 export type CertificateModel = Model<ICertificate>;
