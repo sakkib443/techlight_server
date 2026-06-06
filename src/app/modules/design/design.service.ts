@@ -4,6 +4,7 @@ import {
     IHeroContent,
     IProvideContent,
     IAboutContent,
+    IPaymentContent,
 } from './design.interface';
 
 const CONTACT_KEY = 'contact';
@@ -91,6 +92,28 @@ const updateAboutContent = async (
     return { aboutContent: (doc?.aboutContent || {}) as IAboutContent };
 };
 
+// ==================== Payment ====================
+const PAYMENT_KEY = 'payment';
+
+const getPaymentContent = async (): Promise<{ paymentContent: IPaymentContent }> => {
+    let doc = await Design.findOne({ key: PAYMENT_KEY });
+    if (!doc) {
+        doc = await Design.create({ key: PAYMENT_KEY, paymentContent: {} });
+    }
+    return { paymentContent: (doc.paymentContent || {}) as IPaymentContent };
+};
+
+const updatePaymentContent = async (
+    paymentContent: IPaymentContent
+): Promise<{ paymentContent: IPaymentContent }> => {
+    const doc = await Design.findOneAndUpdate(
+        { key: PAYMENT_KEY },
+        { $set: { paymentContent } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+    return { paymentContent: (doc?.paymentContent || {}) as IPaymentContent };
+};
+
 export const DesignService = {
     getContactContent,
     updateContactContent,
@@ -100,4 +123,6 @@ export const DesignService = {
     updateProvideContent,
     getAboutContent,
     updateAboutContent,
+    getPaymentContent,
+    updatePaymentContent,
 };

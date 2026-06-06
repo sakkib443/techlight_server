@@ -72,10 +72,18 @@ export interface IProvideContent {
 // by the admin editor and the public About page defaults.
 export type IAboutContent = Record<string, unknown>;
 
+export interface IPaymentContent {
+    bkash?: string;
+    rocket?: string;
+    nagad?: string;
+    note?: string;
+}
+
 export interface IDesign {
-    key: string; // e.g. 'contact' | 'hero' | 'provide' | 'about'
+    key: string; // e.g. 'contact' | 'hero' | 'provide' | 'about' | 'payment'
     contactContent?: IContactContent;
     heroContent?: IHeroContent;
     provideContent?: IProvideContent;
     aboutContent?: IAboutContent;
+    paymentContent?: IPaymentContent;
 }

@@ -87,6 +87,17 @@ const updateAboutContent = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// ==================== Payment ====================
+const getPaymentContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.getPaymentContent();
+    sendResponse(res, { statusCode: 200, success: true, message: 'Payment content fetched', data: result });
+});
+
+const updatePaymentContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.updatePaymentContent(req.body.paymentContent || {});
+    sendResponse(res, { statusCode: 200, success: true, message: 'Payment content updated', data: result });
+});
+
 export const DesignController = {
     getContactContent,
     updateContactContent,
@@ -96,4 +107,6 @@ export const DesignController = {
     updateProvideContent,
     getAboutContent,
     updateAboutContent,
+    getPaymentContent,
+    updatePaymentContent,
 };

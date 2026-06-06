@@ -47,4 +47,13 @@ router.patch(
     DesignController.updateAboutContent
 );
 
+// ==================== Payment ====================
+router.get('/payment', DesignController.getPaymentContent);
+router.patch(
+    '/payment',
+    authMiddleware,
+    checkRole('admin'),
+    DesignController.updatePaymentContent
+);
+
 export const DesignRoutes = router;
