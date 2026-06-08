@@ -11,8 +11,8 @@ router.get('/', TestimonialController.getActive);
 // Admin — সব দেখা
 router.get('/all', authMiddleware, authorizeRoles('admin'), TestimonialController.getAll);
 
-// Logged-in user — testimonial submit (optional image upload)
-router.post('/', authMiddleware, (req, res, next) => {
+// Public — anyone can submit a testimonial (optional image upload)
+router.post('/', (req, res, next) => {
     uploadTestimonialImage(req, res, (err) => {
         if (err) return next(err);
         next();
