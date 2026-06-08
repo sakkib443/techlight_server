@@ -72,6 +72,14 @@ export interface IProvideContent {
 // by the admin editor and the public About page defaults.
 export type IAboutContent = Record<string, unknown>;
 
+// ==================== Payment ====================
+export interface IPaymentContent {
+    bkash?: string;
+    rocket?: string;
+    nagad?: string;
+    note?: string;
+}
+
 // ==================== SEO ====================
 export interface ISeoPageMeta {
     title?: string;
@@ -88,13 +96,15 @@ export interface ISeoContent {
     software?: ISeoPageMeta;
     website?: ISeoPageMeta;
     blog?: ISeoPageMeta;
+    faq?: ISeoPageMeta;
 }
 
 export interface IDesign {
-    key: string; // e.g. 'contact' | 'hero' | 'provide' | 'about' | 'seo'
+    key: string; // e.g. 'contact' | 'hero' | 'provide' | 'about' | 'payment' | 'seo'
     contactContent?: IContactContent;
     heroContent?: IHeroContent;
     provideContent?: IProvideContent;
     aboutContent?: IAboutContent;
+    paymentContent?: IPaymentContent;
     seoContent?: ISeoContent;
 }

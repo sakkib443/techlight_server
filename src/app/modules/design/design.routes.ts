@@ -47,6 +47,15 @@ router.patch(
     DesignController.updateAboutContent
 );
 
+// ==================== Payment ====================
+router.get('/payment', DesignController.getPaymentContent);
+router.patch(
+    '/payment',
+    authMiddleware,
+    checkRole('admin'),
+    DesignController.updatePaymentContent
+);
+
 // ==================== SEO ====================
 router.get('/seo', DesignController.getSeoContent);
 router.patch(

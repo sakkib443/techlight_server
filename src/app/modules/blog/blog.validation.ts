@@ -13,51 +13,35 @@ import { z } from 'zod';
 const createBlogSchema = z.object({
     body: z.object({
         title: z
-            .string({
-                required_error: 'Blog title is required',
-            })
+            .string({ required_error: 'Blog title is required' })
             .min(5, 'Title must be at least 5 characters')
             .max(200, 'Title cannot exceed 200 characters'),
-        titleBn: z
-            .string()
-            .max(200, 'Bengali title cannot exceed 200 characters')
-            .optional(),
+        titleBn: z.string().max(200).optional(),
         excerpt: z
-            .string({
-                required_error: 'Blog excerpt is required',
-            })
-            .min(20, 'Excerpt must be at least 20 characters')
-            .max(500, 'Excerpt cannot exceed 500 characters'),
-        excerptBn: z
             .string()
-            .max(500, 'Bengali excerpt cannot exceed 500 characters')
-            .optional(),
+            .min(20, 'Excerpt must be at least 20 characters')
+            .max(500, 'Excerpt cannot exceed 500 characters')
+            .optional()
+            .or(z.literal('')),
+        excerptBn: z.string().max(500).optional(),
         content: z
-            .string({
-                required_error: 'Blog content is required',
-            })
+            .string({ required_error: 'Blog content is required' })
             .min(100, 'Content must be at least 100 characters'),
         contentBn: z.string().optional(),
-        thumbnail: z
-            .string({
-                required_error: 'Thumbnail image is required',
-            })
-            .url('Invalid thumbnail URL'),
+        thumbnail: z.string().url('Invalid thumbnail URL').optional().or(z.literal('')),
         images: z.array(z.string().url()).optional(),
         videoUrl: z.string().url('Invalid video URL').optional().or(z.literal('')),
-        category: z.string({
-            required_error: 'Category is required',
-        }),
+        category: z.string().optional(),
         tags: z
             .array(z.string().max(50, 'Tag cannot exceed 50 characters'))
-            .min(1, 'At least one tag is required')
-            .max(10, 'Cannot have more than 10 tags'),
+            .max(10, 'Cannot have more than 10 tags')
+            .optional(),
         status: z.enum(['draft', 'published', 'archived']).default('draft'),
         isFeatured: z.boolean().default(false),
         isPopular: z.boolean().default(false),
         allowComments: z.boolean().default(true),
-        metaTitle: z.string().max(70, 'Meta title cannot exceed 70 characters').optional(),
-        metaDescription: z.string().max(160, 'Meta description cannot exceed 160 characters').optional(),
+        metaTitle: z.string().max(70).optional(),
+        metaDescription: z.string().max(160).optional(),
         metaKeywords: z.array(z.string()).optional(),
     }),
 });

@@ -4,6 +4,7 @@ import {
     IHeroContent,
     IProvideContent,
     IAboutContent,
+    IPaymentContent,
     ISeoContent,
 } from './design.interface';
 
@@ -11,6 +12,7 @@ const CONTACT_KEY = 'contact';
 const HERO_KEY = 'hero';
 const PROVIDE_KEY = 'provide';
 const ABOUT_KEY = 'about';
+const PAYMENT_KEY = 'payment';
 const SEO_KEY = 'seo';
 
 // ==================== Contact ====================
@@ -93,6 +95,26 @@ const updateAboutContent = async (
     return { aboutContent: (doc?.aboutContent || {}) as IAboutContent };
 };
 
+// ==================== Payment ====================
+const getPaymentContent = async (): Promise<{ paymentContent: IPaymentContent }> => {
+    let doc = await Design.findOne({ key: PAYMENT_KEY });
+    if (!doc) {
+        doc = await Design.create({ key: PAYMENT_KEY, paymentContent: {} });
+    }
+    return { paymentContent: (doc.paymentContent || {}) as IPaymentContent };
+};
+
+const updatePaymentContent = async (
+    paymentContent: IPaymentContent
+): Promise<{ paymentContent: IPaymentContent }> => {
+    const doc = await Design.findOneAndUpdate(
+        { key: PAYMENT_KEY },
+        { $set: { paymentContent } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+    return { paymentContent: (doc?.paymentContent || {}) as IPaymentContent };
+};
+
 // ==================== SEO ====================
 const getSeoContent = async (): Promise<{ seoContent: ISeoContent }> => {
     let doc = await Design.findOne({ key: SEO_KEY });
@@ -122,6 +144,8 @@ export const DesignService = {
     updateProvideContent,
     getAboutContent,
     updateAboutContent,
+    getPaymentContent,
+    updatePaymentContent,
     getSeoContent,
     updateSeoContent,
 };

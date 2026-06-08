@@ -87,8 +87,12 @@ export const updateUserValidation = z.object({
  */
 export const adminUpdateUserValidation = z.object({
   body: z.object({
-    firstName: z.string().max(50).optional(),
-    lastName: z.string().max(50).optional(),
+    firstName: z.string().min(1, 'First name is required').max(50).optional(),
+    lastName: z.string().min(1, 'Last name is required').max(50).optional(),
+    email: z.string().email('Please provide a valid email').optional(),
+    phone: z.string().max(20, 'Phone number is too long').optional().or(z.literal('')),
+    avatar: z.string().optional().or(z.literal('')),
+    bio: z.string().max(500).optional().or(z.literal('')),
     role: z.enum(['admin', 'mentor', 'student']).optional(),
     status: z.enum(['active', 'blocked', 'pending']).optional(),
     isEmailVerified: z.boolean().optional(),

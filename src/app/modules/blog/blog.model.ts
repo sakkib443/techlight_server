@@ -31,7 +31,7 @@ const blogSchema = new Schema<IBlog, BlogModel>(
         },
         excerpt: {
             type: String,
-            required: [true, 'Blog excerpt is required'],
+            default: '',
             maxlength: [500, 'Excerpt cannot exceed 500 characters'],
         },
         excerptBn: {
@@ -49,7 +49,7 @@ const blogSchema = new Schema<IBlog, BlogModel>(
         // Media
         thumbnail: {
             type: String,
-            required: [true, 'Thumbnail image is required'],
+            default: '',
         },
         images: [{
             type: String,
@@ -62,7 +62,7 @@ const blogSchema = new Schema<IBlog, BlogModel>(
         category: {
             type: Schema.Types.ObjectId,
             ref: 'Category',
-            required: [true, 'Category is required'],
+            default: null,
         },
         tags: [{
             type: String,
