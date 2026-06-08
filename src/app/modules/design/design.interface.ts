@@ -49,6 +49,9 @@ export interface IHeroContent {
     primaryButtonText?: string;
     primaryButtonLink?: string;
     stats?: IHeroStat[];
+    heroImage1?: string;
+    heroImage2?: string;
+    heroImage3?: string;
 }
 
 // ==================== Home: What We Provide Section ====================
