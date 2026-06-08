@@ -47,4 +47,14 @@ router.patch(
     DesignController.updateAboutContent
 );
 
+// ==================== SEO ====================
+router.get('/seo', DesignController.getSeoContent);
+router.patch(
+    '/seo',
+    authMiddleware,
+    checkRole('admin'),
+    validateRequest(DesignValidation.updateSeoSchema),
+    DesignController.updateSeoContent
+);
+
 export const DesignRoutes = router;

@@ -4,12 +4,14 @@ import {
     IHeroContent,
     IProvideContent,
     IAboutContent,
+    ISeoContent,
 } from './design.interface';
 
 const CONTACT_KEY = 'contact';
 const HERO_KEY = 'hero';
 const PROVIDE_KEY = 'provide';
 const ABOUT_KEY = 'about';
+const SEO_KEY = 'seo';
 
 // ==================== Contact ====================
 const getContactContent = async (): Promise<{ contactContent: IContactContent }> => {
@@ -91,6 +93,26 @@ const updateAboutContent = async (
     return { aboutContent: (doc?.aboutContent || {}) as IAboutContent };
 };
 
+// ==================== SEO ====================
+const getSeoContent = async (): Promise<{ seoContent: ISeoContent }> => {
+    let doc = await Design.findOne({ key: SEO_KEY });
+    if (!doc) {
+        doc = await Design.create({ key: SEO_KEY, seoContent: {} });
+    }
+    return { seoContent: (doc.seoContent || {}) as ISeoContent };
+};
+
+const updateSeoContent = async (
+    seoContent: ISeoContent
+): Promise<{ seoContent: ISeoContent }> => {
+    const doc = await Design.findOneAndUpdate(
+        { key: SEO_KEY },
+        { $set: { seoContent } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+    return { seoContent: (doc?.seoContent || {}) as ISeoContent };
+};
+
 export const DesignService = {
     getContactContent,
     updateContactContent,
@@ -100,4 +122,6 @@ export const DesignService = {
     updateProvideContent,
     getAboutContent,
     updateAboutContent,
+    getSeoContent,
+    updateSeoContent,
 };

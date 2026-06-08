@@ -24,9 +24,16 @@ const updateAboutSchema = z.object({
     }),
 });
 
+const updateSeoSchema = z.object({
+    body: z.object({
+        seoContent: z.record(z.string(), z.any()).optional(),
+    }),
+});
+
 export const DesignValidation = {
     updateContactSchema,
     updateHeroSchema,
     updateProvideSchema,
     updateAboutSchema,
+    updateSeoSchema,
 };

@@ -20,6 +20,10 @@ const designSchema = new Schema<IDesign>(
             type: Schema.Types.Mixed,
             default: {},
         },
+        seoContent: {
+            type: Schema.Types.Mixed,
+            default: {},
+        },
     },
     {
         timestamps: true,

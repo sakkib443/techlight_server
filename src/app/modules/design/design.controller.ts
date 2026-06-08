@@ -87,6 +87,27 @@ const updateAboutContent = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// ==================== SEO ====================
+const getSeoContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.getSeoContent();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'SEO content fetched successfully',
+        data: result,
+    });
+});
+
+const updateSeoContent = catchAsync(async (req: Request, res: Response) => {
+    const result = await DesignService.updateSeoContent(req.body.seoContent || {});
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'SEO content updated successfully',
+        data: result,
+    });
+});
+
 export const DesignController = {
     getContactContent,
     updateContactContent,
@@ -96,4 +117,6 @@ export const DesignController = {
     updateProvideContent,
     getAboutContent,
     updateAboutContent,
+    getSeoContent,
+    updateSeoContent,
 };

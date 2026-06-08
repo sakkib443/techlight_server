@@ -72,10 +72,29 @@ export interface IProvideContent {
 // by the admin editor and the public About page defaults.
 export type IAboutContent = Record<string, unknown>;
 
+// ==================== SEO ====================
+export interface ISeoPageMeta {
+    title?: string;
+    description?: string;
+}
+
+export interface ISeoContent {
+    siteName?: string;
+    home?: ISeoPageMeta;
+    about?: ISeoPageMeta;
+    courses?: ISeoPageMeta;
+    contact?: ISeoPageMeta;
+    certification?: ISeoPageMeta;
+    software?: ISeoPageMeta;
+    website?: ISeoPageMeta;
+    blog?: ISeoPageMeta;
+}
+
 export interface IDesign {
-    key: string; // e.g. 'contact' | 'hero' | 'provide' | 'about'
+    key: string; // e.g. 'contact' | 'hero' | 'provide' | 'about' | 'seo'
     contactContent?: IContactContent;
     heroContent?: IHeroContent;
     provideContent?: IProvideContent;
     aboutContent?: IAboutContent;
+    seoContent?: ISeoContent;
 }
