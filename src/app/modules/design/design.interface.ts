@@ -68,6 +68,7 @@ export interface IProvideContent {
     buttonText?: string;
     buttonLink?: string;
     features?: IProvideFeature[];
+    provideImage?: string;
 }
 
 // ==================== About Page ====================
