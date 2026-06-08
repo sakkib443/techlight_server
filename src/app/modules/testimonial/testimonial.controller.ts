@@ -23,7 +23,9 @@ const getAll = async (req: Request, res: Response, next: NextFunction) => {
 const create = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const userId = req.user?.userId;
-        const payload = { ...req.body, userId };
+        // If a file was uploaded via multer, req.file.path is the Cloudinary URL
+        const userImage = (req.file as any)?.path || req.body.userImage || '';
+        const payload = { ...req.body, userId, ...(userImage && { userImage }) };
         const testimonial = await TestimonialService.createTestimonial(payload);
         res.status(201).json({ success: true, message: 'Testimonial added successfully', data: testimonial });
     } catch (error) { next(error); }

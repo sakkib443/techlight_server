@@ -106,6 +106,13 @@ export const uploadAvatar = multer({
     fileFilter: imageFileFilter,
 }).single('avatar');
 
+// Testimonial user photo upload (single image)
+export const uploadTestimonialImage = multer({
+    storage: createStorage('testimonials'),
+    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
+    fileFilter: imageFileFilter,
+}).single('userImage');
+
 // Software screenshots upload (multiple images)
 export const uploadSoftwareImages = multer({
     storage: createStorage('software'),

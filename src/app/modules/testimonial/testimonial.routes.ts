@@ -1,6 +1,7 @@
 import express from 'express';
 import { TestimonialController } from './testimonial.controller';
 import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
+import { uploadTestimonialImage } from '../../utils/cloudinary';
 
 const router = express.Router();
 
@@ -10,8 +11,13 @@ router.get('/', TestimonialController.getActive);
 // Admin — সব দেখা
 router.get('/all', authMiddleware, authorizeRoles('admin'), TestimonialController.getAll);
 
-// Logged-in user — testimonial submit
-router.post('/', authMiddleware, TestimonialController.create);
+// Logged-in user — testimonial submit (optional image upload)
+router.post('/', authMiddleware, (req, res, next) => {
+    uploadTestimonialImage(req, res, (err) => {
+        if (err) return next(err);
+        next();
+    });
+}, TestimonialController.create);
 
 // Admin only
 router.patch('/:id/toggle', authMiddleware, authorizeRoles('admin'), TestimonialController.toggleActive);
