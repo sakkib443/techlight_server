@@ -37,6 +37,10 @@ export interface ICertificate {
     startDate?: Date;                     // snapshot
     endDate?: Date;                       // snapshot
 
+    // ==================== Signature ====================
+    signatureName?: string;               // who signs the certificate
+    signatureDesignation?: string;        // their designation/title
+
     // ==================== Issuance ====================
     issuedBy?: Types.ObjectId;            // Admin who issued it
     issueDate: Date;

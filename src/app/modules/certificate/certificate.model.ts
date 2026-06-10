@@ -67,6 +67,10 @@ const certificateSchema = new Schema<ICertificate, CertificateModel>(
         startDate: { type: Date },
         endDate: { type: Date },
 
+        // ==================== Signature ====================
+        signatureName: { type: String, trim: true, default: '' },
+        signatureDesignation: { type: String, trim: true, default: '' },
+
         // ==================== Issuance ====================
         issuedBy: {
             type: Schema.Types.ObjectId,

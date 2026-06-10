@@ -21,6 +21,8 @@ const issueCertificateSchema = z.object({
         startDate: z.string().optional(),
         endDate: z.string().optional(),
         issueDate: z.string().optional(),
+        signatureName: z.string().optional(),
+        signatureDesignation: z.string().optional(),
     }),
 });
 
@@ -39,6 +41,8 @@ const updateCertificateSchema = z.object({
         startDate: z.string().optional(),
         endDate: z.string().optional(),
         issueDate: z.string().optional(),
+        signatureName: z.string().optional(),
+        signatureDesignation: z.string().optional(),
         status: z.enum(['issued', 'revoked']).optional(),
     }),
 });

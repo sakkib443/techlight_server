@@ -22,6 +22,8 @@ interface IIssueCertificatePayload {
     startDate?: string;
     endDate?: string;
     issueDate?: string;
+    signatureName?: string;
+    signatureDesignation?: string;
     issuedBy?: string;
 }
 
@@ -94,6 +96,8 @@ const issueCertificate = async (payload: IIssueCertificatePayload): Promise<ICer
         grade: payload.grade || '',
         certificateBatch: payload.certificateBatch || undefined,
         ...batchSnapshot,
+        signatureName: payload.signatureName?.trim() || '',
+        signatureDesignation: payload.signatureDesignation?.trim() || '',
         issuedBy: payload.issuedBy,
         issueDate: payload.issueDate ? new Date(payload.issueDate) : new Date(),
     });
