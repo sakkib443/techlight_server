@@ -35,13 +35,22 @@ const updateContactContent = async (
     return { contactContent: (doc?.contactContent || {}) as IContactContent };
 };
 
+const DEFAULT_HERO_BANNER = '/images/bg hero.png';
+
 // ==================== Home: Hero ====================
 const getHeroContent = async (): Promise<{ heroContent: IHeroContent }> => {
     let doc = await Design.findOne({ key: HERO_KEY });
     if (!doc) {
-        doc = await Design.create({ key: HERO_KEY, heroContent: {} });
+        doc = await Design.create({
+            key: HERO_KEY,
+            heroContent: { bannerImage: DEFAULT_HERO_BANNER },
+        });
     }
-    return { heroContent: (doc.heroContent || {}) as IHeroContent };
+    const heroContent = (doc.heroContent || {}) as IHeroContent;
+    if (!heroContent.bannerImage) {
+        heroContent.bannerImage = DEFAULT_HERO_BANNER;
+    }
+    return { heroContent };
 };
 
 const updateHeroContent = async (
