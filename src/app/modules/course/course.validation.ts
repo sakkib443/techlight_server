@@ -72,7 +72,7 @@ const createCourseSchema = z.object({
         currency: z.enum(['BDT', 'USD']).optional().default('BDT'),
         isFree: z.boolean().optional(),
 
-        courseType: z.enum(['online', 'offline', 'recorded']).optional().default('recorded'),
+        courseType: z.enum(['online', 'offline', 'recorded', 'online_offline']).optional().default('recorded'),
         level: z.enum(['beginner', 'intermediate', 'advanced']).optional().default('beginner'),
         language: z.enum(['bangla', 'english', 'both']).optional().default('english'),
 
@@ -129,7 +129,7 @@ const updateCourseSchema = z.object({
         currency: z.enum(['BDT', 'USD']).optional(),
         isFree: z.boolean().optional(),
 
-        courseType: z.enum(['online', 'offline', 'recorded']).optional(),
+        courseType: z.enum(['online', 'offline', 'recorded', 'online_offline']).optional(),
         level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
         language: z.enum(['bangla', 'english', 'both']).optional(),
 
@@ -165,7 +165,7 @@ const courseQuerySchema = z.object({
     query: z.object({
         searchTerm: z.string().optional(),
         category: z.string().optional(),
-        courseType: z.enum(['online', 'offline', 'recorded']).optional(),
+        courseType: z.enum(['online', 'offline', 'recorded', 'online_offline']).optional(),
         level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
         language: z.enum(['bangla', 'english', 'both']).optional(),
         status: z.enum(['draft', 'published', 'archived']).optional(),

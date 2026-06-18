@@ -115,7 +115,7 @@ const courseSchema = new Schema<ICourse, CourseModel>(
         courseType: {
             type: String,
             enum: {
-                values: ['online', 'offline', 'recorded'],
+                values: ['online', 'offline', 'recorded', 'online_offline'],
                 message: '{VALUE} is not a valid course type',
             },
             default: 'recorded',

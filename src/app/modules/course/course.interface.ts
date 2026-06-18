@@ -9,7 +9,7 @@ import { Model, Types } from 'mongoose';
 /**
  * Course Type - কোর্সের ধরণ
  */
-export type TCourseType = 'online' | 'offline' | 'recorded';
+export type TCourseType = 'online' | 'offline' | 'recorded' | 'online_offline';
 
 /**
  * Course Level - কোর্সের লেভেল
