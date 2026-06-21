@@ -34,8 +34,9 @@ export interface ICertificate {
     batchNumber?: string;                 // snapshot
     batchName?: string;                   // snapshot
     mentorName?: string;                  // snapshot
-    startDate?: Date;                     // snapshot
-    endDate?: Date;                       // snapshot
+    startDate?: Date;                     // snapshot (training start)
+    endDate?: Date;                       // snapshot (training end)
+    durationHours?: number;               // total training duration in hours
 
     // ==================== Signature ====================
     signatureName?: string;               // who signs the certificate

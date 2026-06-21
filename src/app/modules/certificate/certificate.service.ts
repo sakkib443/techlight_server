@@ -21,6 +21,7 @@ interface IIssueCertificatePayload {
     mentorName?: string;
     startDate?: string;
     endDate?: string;
+    durationHours?: number | string;
     issueDate?: string;
     signatureName?: string;
     signatureDesignation?: string;
@@ -96,6 +97,10 @@ const issueCertificate = async (payload: IIssueCertificatePayload): Promise<ICer
         grade: payload.grade || '',
         certificateBatch: payload.certificateBatch || undefined,
         ...batchSnapshot,
+        durationHours:
+            payload.durationHours !== undefined && payload.durationHours !== ''
+                ? Number(payload.durationHours)
+                : undefined,
         signatureName: payload.signatureName?.trim() || '',
         signatureDesignation: payload.signatureDesignation?.trim() || '',
         issuedBy: payload.issuedBy,

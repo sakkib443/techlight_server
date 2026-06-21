@@ -66,6 +66,7 @@ const certificateSchema = new Schema<ICertificate, CertificateModel>(
         mentorName: { type: String, trim: true, default: '' },
         startDate: { type: Date },
         endDate: { type: Date },
+        durationHours: { type: Number },
 
         // ==================== Signature ====================
         signatureName: { type: String, trim: true, default: '' },
