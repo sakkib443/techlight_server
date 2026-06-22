@@ -12,7 +12,9 @@ import {
     uploadAvatar,
     uploadSoftwareImages,
     uploadDownloadFile,
+    uploadHeroVideo,
     deleteImage,
+    deleteVideo,
     deleteRawFile,
     getPublicIdFromUrl
 } from '../../utils/cloudinary';
@@ -221,6 +223,34 @@ export const uploadZipFile = async (req: Request, res: Response, next: NextFunct
     });
 };
 
+// ==================== Hero / Banner Video Upload ====================
+export const uploadVideo = async (req: Request, res: Response, next: NextFunction) => {
+    uploadHeroVideo(req, res, (err: any) => {
+        if (err) {
+            return res.status(400).json({
+                success: false,
+                message: err.message || 'Video upload failed',
+            });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'No video file provided',
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Video uploaded successfully',
+            data: {
+                url: (req.file as any).path,
+                filename: req.file.filename,
+            },
+        });
+    });
+};
+
 // ==================== Delete Image ====================
 export const removeImage = async (req: Request, res: Response) => {
     try {
@@ -243,10 +273,13 @@ export const removeImage = async (req: Request, res: Response) => {
             });
         }
 
-        // Delete from Cloudinary (check if it's a raw file or image)
+        // Delete from Cloudinary (check resource type from `type` or URL path)
         const isRawFile = type === 'raw' || url.includes('/raw/upload/');
+        const isVideo = type === 'video' || url.includes('/video/upload/');
         const deleted = isRawFile
             ? await deleteRawFile(publicId)
+            : isVideo
+            ? await deleteVideo(publicId)
             : await deleteImage(publicId);
 
         if (deleted) {

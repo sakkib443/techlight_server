@@ -45,6 +45,20 @@ const createStorage = (folder: string) => {
     });
 };
 
+// Create storage for video files (MP4, WebM, MOV, etc.)
+const createVideoStorage = (folder: string) => {
+    return new CloudinaryStorage({
+        cloudinary: cloudinary,
+        params: async (req, file) => {
+            return {
+                folder: `hiictpark/${folder}`,
+                resource_type: 'video', // Important: video for video files
+                public_id: `${Date.now()}-${file.originalname.split('.')[0]}`,
+            };
+        },
+    });
+};
+
 // Create storage for raw files (ZIP, RAR, etc.)
 const createRawStorage = (folder: string) => {
     return new CloudinaryStorage({
@@ -76,7 +90,30 @@ const imageFileFilter = (req: any, file: Express.Multer.File, cb: any) => {
     }
 };
 
+// File filter for video uploads
+const videoFileFilter = (req: any, file: Express.Multer.File, cb: any) => {
+    const allowedMimes = [
+        'video/mp4',
+        'video/webm',
+        'video/ogg',
+        'video/quicktime', // .mov
+        'video/x-matroska', // .mkv
+    ];
+    if (allowedMimes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error(`Invalid file type. Only MP4, WebM, OGG, MOV, MKV videos are allowed. Got: ${file.mimetype}`));
+    }
+};
+
 // ==================== Multer Upload Middleware ====================
+
+// Hero / banner video upload (single video)
+export const uploadHeroVideo = multer({
+    storage: createVideoStorage('hero-videos'),
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+    fileFilter: videoFileFilter,
+}).single('video');
 
 // Website images upload (multiple images allowed)
 export const uploadWebsiteImages = multer({
@@ -159,6 +196,17 @@ export const deleteImage = async (publicId: string): Promise<boolean> => {
         return result.result === 'ok';
     } catch (error) {
         console.error('Error deleting image from Cloudinary:', error);
+        return false;
+    }
+};
+
+// Delete video from Cloudinary
+export const deleteVideo = async (publicId: string): Promise<boolean> => {
+    try {
+        const result = await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
+        return result.result === 'ok';
+    } catch (error) {
+        console.error('Error deleting video from Cloudinary:', error);
         return false;
     }
 };

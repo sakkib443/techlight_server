@@ -53,6 +53,10 @@ export interface IHeroContent {
     heroImage2?: string;
     heroImage3?: string;
     bannerImage?: string;
+    // Hero media: choose what shows in the homepage banner area
+    mediaType?: 'image' | 'video' | 'youtube';
+    videoUrl?: string; // Cloudinary-uploaded video
+    youtubeUrl?: string; // YouTube link
 }
 
 // ==================== Home: What We Provide Section ====================

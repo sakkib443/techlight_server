@@ -13,6 +13,7 @@ import {
     uploadPlatformImage,
     uploadSoftwareScreenshots,
     uploadZipFile,
+    uploadVideo,
     removeImage,
 } from './upload.controller';
 
@@ -40,6 +41,9 @@ router.post('/software', authMiddleware, uploadSoftwareScreenshots);
 
 // ZIP/RAR file upload (for download files - admin/seller)
 router.post('/file', authMiddleware, uploadZipFile);
+
+// Hero / banner video upload (admin only)
+router.post('/video', authMiddleware, authorizeRoles('admin'), uploadVideo);
 
 // Delete image/file
 router.delete('/delete', authMiddleware, removeImage);
