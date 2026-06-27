@@ -42,10 +42,46 @@ export const updateCategoryValidation = z.object({
         type: z.enum(['course', 'website', 'software', 'design-template']).optional(),
 
         order: z.number().optional(),
+        showOnHome: z.boolean().optional(),
+        homeOrder: z.number().optional(),
         isParent: z.boolean().optional(),
     }),
     params: z.object({
         id: z.string({ required_error: 'Category ID is required' }),
+    }),
+});
+
+/**
+ * Reorder Categories Validation
+ * Category গুলোর display order একসাথে সেট করার জন্য
+ */
+export const reorderCategoriesValidation = z.object({
+    body: z.object({
+        items: z
+            .array(
+                z.object({
+                    id: z.string({ required_error: 'Category id is required' }),
+                    order: z.number(),
+                })
+            )
+            .min(1, 'At least one category is required'),
+    }),
+});
+
+/**
+ * Reorder Homepage Categories Validation
+ * হোম পেজে কোন category কোন order এ দেখাবে সেটা সেট করার জন্য
+ */
+export const reorderHomeCategoriesValidation = z.object({
+    body: z.object({
+        items: z
+            .array(
+                z.object({
+                    id: z.string({ required_error: 'Category id is required' }),
+                    homeOrder: z.number(),
+                })
+            )
+            .min(1, 'At least one category is required'),
     }),
 });
 

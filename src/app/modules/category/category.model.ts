@@ -61,6 +61,14 @@ const categorySchema = new Schema<ICategory>(
             type: Number,
             default: 0,
         },
+        showOnHome: {
+            type: Boolean,
+            default: false,
+        },
+        homeOrder: {
+            type: Number,
+            default: 0,
+        },
         isParent: {
             type: Boolean,
             default: false,
@@ -76,6 +84,7 @@ const categorySchema = new Schema<ICategory>(
 categorySchema.index({ slug: 1 });
 categorySchema.index({ status: 1 });
 categorySchema.index({ order: 1 });
+categorySchema.index({ showOnHome: 1, homeOrder: 1 });
 
 // Pre-save: Generate slug from name
 categorySchema.pre('save', function (next) {

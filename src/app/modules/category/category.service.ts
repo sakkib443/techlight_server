@@ -182,6 +182,34 @@ const CategoryService = {
         await Category.findByIdAndDelete(id);
     },
 
+    // ==================== REORDER CATEGORIES ====================
+    async reorderCategories(items: { id: string; order: number }[]): Promise<void> {
+        const operations = items.map((item) => ({
+            updateOne: {
+                filter: { _id: item.id },
+                update: { $set: { order: item.order } },
+            },
+        }));
+
+        if (operations.length > 0) {
+            await Category.bulkWrite(operations);
+        }
+    },
+
+    // ==================== REORDER HOMEPAGE CATEGORIES ====================
+    async reorderHomeCategories(items: { id: string; homeOrder: number }[]): Promise<void> {
+        const operations = items.map((item) => ({
+            updateOne: {
+                filter: { _id: item.id },
+                update: { $set: { homeOrder: item.homeOrder, showOnHome: true } },
+            },
+        }));
+
+        if (operations.length > 0) {
+            await Category.bulkWrite(operations);
+        }
+    },
+
     // ==================== INCREMENT PRODUCT COUNT ====================
     async incrementProductCount(categoryId: string): Promise<void> {
         await Category.findByIdAndUpdate(categoryId, { $inc: { productCount: 1 } });

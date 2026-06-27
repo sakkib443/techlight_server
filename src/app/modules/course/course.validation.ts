@@ -94,6 +94,7 @@ const createCourseSchema = z.object({
         status: z.enum(['draft', 'published', 'archived']).optional().default('draft'),
         isFeatured: z.boolean().optional(),
         isPopular: z.boolean().optional(),
+        popularOrder: z.number().optional(),
 
         metaTitle: z.string().max(100).optional(),
         metaDescription: z.string().max(300).optional(),
@@ -151,9 +152,45 @@ const updateCourseSchema = z.object({
         status: z.enum(['draft', 'published', 'archived']).optional(),
         isFeatured: z.boolean().optional(),
         isPopular: z.boolean().optional(),
+        popularOrder: z.number().optional(),
+        displayOrder: z.number().optional(),
 
         metaTitle: z.string().max(100).optional(),
         metaDescription: z.string().max(300).optional(),
+    }),
+});
+
+/**
+ * Reorder Popular Courses Validation
+ * Homepage popular section এর order সেট করার জন্য
+ */
+const reorderPopularSchema = z.object({
+    body: z.object({
+        items: z
+            .array(
+                z.object({
+                    id: z.string({ required_error: 'Course id is required' }),
+                    popularOrder: z.number(),
+                })
+            )
+            .min(1, 'At least one course is required'),
+    }),
+});
+
+/**
+ * Reorder Courses Validation
+ * /courses listing page এর default order সেট করার জন্য
+ */
+const reorderCoursesSchema = z.object({
+    body: z.object({
+        items: z
+            .array(
+                z.object({
+                    id: z.string({ required_error: 'Course id is required' }),
+                    displayOrder: z.number(),
+                })
+            )
+            .min(1, 'At least one course is required'),
     }),
 });
 
@@ -183,5 +220,7 @@ const courseQuerySchema = z.object({
 export const CourseValidation = {
     createCourseSchema,
     updateCourseSchema,
+    reorderPopularSchema,
+    reorderCoursesSchema,
     courseQuerySchema,
 };

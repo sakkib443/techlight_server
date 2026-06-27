@@ -215,6 +215,14 @@ const courseSchema = new Schema<ICourse, CourseModel>(
             type: Boolean,
             default: false,
         },
+        popularOrder: {
+            type: Number,
+            default: 0,
+        },
+        displayOrder: {
+            type: Number,
+            default: 0,
+        },
 
         // ==================== Statistics ====================
         totalEnrollments: {
@@ -277,6 +285,8 @@ courseSchema.index({ category: 1 });
 courseSchema.index({ status: 1 });
 courseSchema.index({ courseType: 1 });
 courseSchema.index({ isFeatured: 1 });
+courseSchema.index({ isPopular: 1, popularOrder: 1 });
+courseSchema.index({ displayOrder: 1 });
 courseSchema.index({ price: 1 });
 courseSchema.index({ averageRating: -1 });
 courseSchema.index({ totalEnrollments: -1 });

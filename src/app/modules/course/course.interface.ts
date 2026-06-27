@@ -96,7 +96,9 @@ export interface ICourse {
     // ==================== Status & Visibility ====================
     status: TCourseStatus;            // Draft/Published/Archived
     isFeatured: boolean;              // Show on homepage
-    isPopular: boolean;               // Mark as popular
+    isPopular: boolean;               // Mark as popular (show in homepage popular section)
+    popularOrder: number;             // Manual order position in homepage popular section
+    displayOrder: number;             // Manual order position in the /courses listing page
 
     // ==================== Statistics (Auto Updated) ====================
     totalEnrollments: number;         // Total students enrolled

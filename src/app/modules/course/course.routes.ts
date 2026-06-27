@@ -80,6 +80,24 @@ router.post(
 // ==================== Admin Only Routes ====================
 // শুধুমাত্র Admin এই routes access করতে পারবে
 
+// Reorder homepage popular courses (Admin only)
+router.patch(
+    '/popular/reorder',
+    authMiddleware,
+    authorizeRoles('admin'),
+    validateRequest(CourseValidation.reorderPopularSchema),
+    CourseController.reorderPopularCourses
+);
+
+// Reorder /courses listing default order (Admin only)
+router.patch(
+    '/reorder',
+    authMiddleware,
+    authorizeRoles('admin'),
+    validateRequest(CourseValidation.reorderCoursesSchema),
+    CourseController.reorderCourses
+);
+
 // Create new course (Admin and Mentor)
 router.post(
     '/',

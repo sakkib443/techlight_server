@@ -144,6 +144,10 @@ const getAllCourses = async (
     // Sort configuration
     const sortConfig: any = {};
     sortConfig[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    // When sorting by a manual order field, break ties with newest-first
+    if (sortBy !== 'createdAt') {
+        sortConfig.createdAt = -1;
+    }
 
     // Execute query
     const courses = await Course.find(whereCondition)
@@ -289,9 +293,23 @@ const getFeaturedCourses = async (limit: number = 6): Promise<ICourse[]> => {
 
 /**
  * Get popular courses
- * জনপ্রিয় কোর্স পাওয়া (by enrollments)
+ * জনপ্রিয় কোর্স পাওয়া
+ * Admin যদি manually কোনো কোর্সকে popular মার্ক করে থাকে, তাহলে সেই অর্ডার অনুযায়ী দেখাবে।
+ * কোনোটা মার্ক করা না থাকলে fallback হিসেবে enrollment অনুযায়ী দেখাবে।
  */
 const getPopularCourses = async (limit: number = 6): Promise<ICourse[]> => {
+    const manuallyPopular = await Course.find({ isPopular: true, status: 'published' })
+        .populate('category', 'name nameEn icon')
+        .populate('instructor')
+        .sort({ popularOrder: 1, updatedAt: -1 })
+        .limit(limit)
+        .lean();
+
+    if (manuallyPopular.length > 0) {
+        return manuallyPopular;
+    }
+
+    // Fallback: no course manually marked popular → show top by enrollments
     const courses = await Course.find({ status: 'published' })
         .populate('category', 'name nameEn icon')
         .populate('instructor')
@@ -300,6 +318,44 @@ const getPopularCourses = async (limit: number = 6): Promise<ICourse[]> => {
         .lean();
 
     return courses;
+};
+
+/**
+ * Reorder popular courses
+ * Homepage popular section এর কোর্সগুলোর order একসাথে সেট করা
+ */
+const reorderPopularCourses = async (
+    items: { id: string; popularOrder: number }[]
+): Promise<void> => {
+    const operations = items.map((item) => ({
+        updateOne: {
+            filter: { _id: item.id },
+            update: { $set: { popularOrder: item.popularOrder, isPopular: true } },
+        },
+    }));
+
+    if (operations.length > 0) {
+        await Course.bulkWrite(operations);
+    }
+};
+
+/**
+ * Reorder courses for the /courses listing page
+ * /courses পেজের default order একসাথে সেট করা
+ */
+const reorderCourses = async (
+    items: { id: string; displayOrder: number }[]
+): Promise<void> => {
+    const operations = items.map((item) => ({
+        updateOne: {
+            filter: { _id: item.id },
+            update: { $set: { displayOrder: item.displayOrder } },
+        },
+    }));
+
+    if (operations.length > 0) {
+        await Course.bulkWrite(operations);
+    }
 };
 
 /**
@@ -456,6 +512,8 @@ export const CourseService = {
     deleteCourse,
     getFeaturedCourses,
     getPopularCourses,
+    reorderPopularCourses,
+    reorderCourses,
     getCoursesByCategory,
     updateCourseStats,
     getCourseContentForStudent,

@@ -7,7 +7,7 @@ import express from 'express';
 import CategoryController from './category.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
-import { createCategoryValidation, updateCategoryValidation } from './category.validation';
+import { createCategoryValidation, updateCategoryValidation, reorderCategoriesValidation, reorderHomeCategoriesValidation } from './category.validation';
 
 const router = express.Router();
 
@@ -65,6 +65,26 @@ router.post(
     authorizeRoles('admin', 'mentor'),
     validateRequest(createCategoryValidation),
     CategoryController.createCategory
+);
+
+// PATCH /api/categories/admin/reorder - Reorder categories (Admin and Mentor)
+// NOTE: must be defined before '/admin/:id' so 'reorder' isn't treated as an id
+router.patch(
+    '/admin/reorder',
+    authMiddleware,
+    authorizeRoles('admin', 'mentor'),
+    validateRequest(reorderCategoriesValidation),
+    CategoryController.reorderCategories
+);
+
+// PATCH /api/categories/admin/home-reorder - Reorder homepage categories
+// NOTE: must be defined before '/admin/:id'
+router.patch(
+    '/admin/home-reorder',
+    authMiddleware,
+    authorizeRoles('admin', 'mentor'),
+    validateRequest(reorderHomeCategoriesValidation),
+    CategoryController.reorderHomeCategories
 );
 
 // PATCH /api/categories/admin/:id - Update category (Admin and Mentor)

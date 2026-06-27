@@ -211,6 +211,42 @@ const getPopularCourses = async (req: Request, res: Response, next: NextFunction
 };
 
 /**
+ * Reorder popular courses (Admin only)
+ * PATCH /api/courses/popular/reorder
+ */
+const reorderPopularCourses = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { items } = req.body;
+        await CourseService.reorderPopularCourses(items);
+
+        res.status(200).json({
+            success: true,
+            message: 'Popular courses reordered successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Reorder courses for /courses listing (Admin only)
+ * PATCH /api/courses/reorder
+ */
+const reorderCourses = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { items } = req.body;
+        await CourseService.reorderCourses(items);
+
+        res.status(200).json({
+            success: true,
+            message: 'Courses reordered successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
  * Get courses by category
  * GET /api/courses/category/:categoryId
  */
@@ -319,6 +355,8 @@ export const CourseController = {
     deleteCourse,
     getFeaturedCourses,
     getPopularCourses,
+    reorderPopularCourses,
+    reorderCourses,
     getCoursesByCategory,
     getCourseContentForStudent,
     syncAllCourseStats,

@@ -21,7 +21,9 @@ export interface ICategory {
     type: 'course' | 'website' | 'software' | 'design-template'; // Type of category
 
     productCount: number;   // Total products in this category
-    order: number;          // Display order
+    order: number;          // Display order (general — used everywhere)
+    showOnHome: boolean;    // Show this category in the homepage section
+    homeOrder: number;      // Order within the homepage categories section
     isParent: boolean;      // Is this a parent category?
     createdAt?: Date;
     updatedAt?: Date;

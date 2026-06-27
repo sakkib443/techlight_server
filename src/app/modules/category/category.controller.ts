@@ -124,6 +124,28 @@ const CategoryController = {
         });
     }),
 
+    // ==================== REORDER (Admin) ====================
+    reorderCategories: catchAsync(async (req: Request, res: Response) => {
+        await CategoryService.reorderCategories(req.body.items);
+
+        sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: 'Categories reordered successfully',
+        });
+    }),
+
+    // ==================== REORDER HOMEPAGE CATEGORIES (Admin) ====================
+    reorderHomeCategories: catchAsync(async (req: Request, res: Response) => {
+        await CategoryService.reorderHomeCategories(req.body.items);
+
+        sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: 'Homepage categories reordered successfully',
+        });
+    }),
+
     // ==================== DELETE (Admin) ====================
     deleteCategory: catchAsync(async (req: Request, res: Response) => {
         await CategoryService.deleteCategory(req.params.id);
